@@ -1,0 +1,3 @@
+[submodule "submodules/Pencil.Gaming"]
+	path = submodules/Pencil.Gaming
+	url = https://github.com/rozniak/Pencil.Gaming.git
