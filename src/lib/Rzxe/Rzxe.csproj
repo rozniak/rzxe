@@ -74,12 +74,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\submodules\Pencil.Gaming\Pencil.Gaming\Pencil.Gaming.csproj">
-      <Project>{ddb6db6d-e5de-4bdb-8ac8-26df800e9ff0}</Project>
-      <Name>Pencil.Gaming</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <ContentWithTargetPath Include="Windowing\Implementations\GlfwFx\Shaders\fragment.glsl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <TargetPath>Engine\Renderer\Shaders\GL\fragment.glsl</TargetPath>
@@ -88,6 +82,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <TargetPath>Engine\Renderer\Shaders\GL\vertex.glsl</TargetPath>
     </ContentWithTargetPath>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\submodules\Pencil.Gaming\Pencil.Gaming\Pencil.Gaming.csproj">
+      <Project>{ddb6db6d-e5de-4bdb-8ac8-26df800e9ff0}</Project>
+      <Name>Pencil.Gaming</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
