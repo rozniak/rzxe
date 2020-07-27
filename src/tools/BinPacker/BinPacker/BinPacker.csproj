@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\..\..\submodules\Oddmatics-Util\src\Oddmatics.Util.Collections\Oddmatics.Util.Collections.csproj" />
     <ProjectReference Include="..\..\..\..\submodules\Oddmatics-Util\src\Oddmatics.Util.System\Oddmatics.Util.System.csproj" />
   </ItemGroup>
