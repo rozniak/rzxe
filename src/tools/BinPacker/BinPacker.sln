@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2010
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30225.117
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BinPacker", "BinPacker\BinPacker.csproj", "{8600D7A4-73C9-46DD-ABE0-57FFE74D7092}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Oddmatics.Util.Collections", "..\..\..\submodules\Oddmatics-Util\src\Oddmatics.Util.Collections\Oddmatics.Util.Collections.csproj", "{E028425B-EC93-4A63-97E7-7FF1BB71B238}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Oddmatics.Util.System", "..\..\..\submodules\Oddmatics-Util\src\Oddmatics.Util.System\Oddmatics.Util.System.csproj", "{180A2598-F831-4E2C-BEAF-D3F8A04A98C3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BinPacker", "BinPacker\BinPacker.csproj", "{5AB0A6C2-EC1B-4CF5-9494-74C2A019D2BE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +15,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8600D7A4-73C9-46DD-ABE0-57FFE74D7092}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8600D7A4-73C9-46DD-ABE0-57FFE74D7092}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8600D7A4-73C9-46DD-ABE0-57FFE74D7092}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8600D7A4-73C9-46DD-ABE0-57FFE74D7092}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E028425B-EC93-4A63-97E7-7FF1BB71B238}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E028425B-EC93-4A63-97E7-7FF1BB71B238}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E028425B-EC93-4A63-97E7-7FF1BB71B238}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E028425B-EC93-4A63-97E7-7FF1BB71B238}.Release|Any CPU.Build.0 = Release|Any CPU
+		{180A2598-F831-4E2C-BEAF-D3F8A04A98C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{180A2598-F831-4E2C-BEAF-D3F8A04A98C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{180A2598-F831-4E2C-BEAF-D3F8A04A98C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{180A2598-F831-4E2C-BEAF-D3F8A04A98C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5AB0A6C2-EC1B-4CF5-9494-74C2A019D2BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AB0A6C2-EC1B-4CF5-9494-74C2A019D2BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AB0A6C2-EC1B-4CF5-9494-74C2A019D2BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AB0A6C2-EC1B-4CF5-9494-74C2A019D2BE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

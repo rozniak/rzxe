@@ -1,5 +1,4 @@
-﻿using Microsoft.WindowsAPICodePack.Dialogs;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Oddmatics.Tools.BinPacker.Algorithm;
 using Oddmatics.Tools.BinPacker.Data;
 using Oddmatics.Tools.BinPacker.Dialogs;
@@ -47,11 +46,11 @@ namespace Oddmatics.Tools.BinPacker
         /// </summary>
         public void CreateNew()
         {
-            TaskDialogResult shouldSaveFirst = CheckDiscard();
+            DialogResult shouldSaveFirst = CheckDiscard();
 
             switch (shouldSaveFirst)
             {
-                case TaskDialogResult.Yes:
+                case DialogResult.Yes:
                     bool saveOccurred = Save(File.LastFileName);
 
                     if (!saveOccurred)
@@ -59,7 +58,7 @@ namespace Oddmatics.Tools.BinPacker
 
                     break;
 
-                case TaskDialogResult.Cancel:
+                case DialogResult.Cancel:
                     return;
             }
 
@@ -85,8 +84,8 @@ namespace Oddmatics.Tools.BinPacker
 
             File.SetAtlasSize(newAtlasSize);
 
+            File.ChangesAccepted += File_ChangesAccepted;
             File.Invalidated += File_Invalidated;
-            File.Saved += File_Saved;
 
             // Update the form
             //
@@ -97,7 +96,9 @@ namespace Oddmatics.Tools.BinPacker
             // Dispose the old file if needed
             //
             if (oldFile != null)
+            {
                 DisposeWorkingFile(ref oldFile);
+            }
         }
 
         /// <summary>
@@ -132,20 +133,13 @@ namespace Oddmatics.Tools.BinPacker
             }
             catch (Exception ex)
             {
-                var errorDialog = new TaskDialog();
-
-                errorDialog.Caption = Application.ProductName;
-                errorDialog.FooterText = String.Format(
-                    "Exception Message: {0}\n\nStack Trace:\n{1}",
-                    ex.Message,
-                    ex.StackTrace
-                    );
-                errorDialog.Icon = TaskDialogStandardIcon.Error;
-                errorDialog.InstructionText = "An error occurred whilst saving the atlas.";
-                errorDialog.OwnerWindowHandle = this.Handle;
-                errorDialog.StandardButtons = TaskDialogStandardButtons.Ok;
-
-                errorDialog.Show();
+                MessageBox.Show(
+                    $"An error occurred whilst saving the atlas.{ex.Message}\n\n" +
+                    $"{ex.StackTrace}",
+                    Application.ProductName,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
 
                 return false;
             }
@@ -159,27 +153,26 @@ namespace Oddmatics.Tools.BinPacker
         /// contains any.
         /// </summary>
         /// <returns>
-        /// Yes if the user would like to save, No if the discard operation should
-        /// continue, Cancel if the user would like to go back to the program.
+        /// <see cref="DialogResult.Yes"/> if the user would like to save,
+        /// <see cref="DialogResult.No"/> if the discard operation should continue,
+        /// <see cref="DialogResult.Cancel"/> if the user would like to go back to the 
+        /// program.
         /// </returns>
-        private TaskDialogResult CheckDiscard()
+        private DialogResult CheckDiscard()
         {
             // No need to prompt if the file has been saved or no file exists
             //
-            if (File == null || !File.IsUnsaved)
-                return TaskDialogResult.No;
+            if (File == null || !File.IsChanged)
+            {
+                return DialogResult.No;
+            }
 
-            var dialog = new TaskDialog();
-
-            dialog.Caption = Application.ProductName;
-            dialog.InstructionText = "Do you want to save changes to the atlas?";
-            dialog.OwnerWindowHandle = this.Handle;
-            dialog.StandardButtons =
-                TaskDialogStandardButtons.Yes | 
-                TaskDialogStandardButtons.No |
-                TaskDialogStandardButtons.Cancel;
-
-            return dialog.Show();
+            return MessageBox.Show(
+                "Do you want to save changes to the atlas?",
+                Application.ProductName,
+                MessageBoxButtons.YesNoCancel,
+                MessageBoxIcon.Question
+            );
         }
 
         /// <summary>
@@ -190,8 +183,8 @@ namespace Oddmatics.Tools.BinPacker
         /// </param>
         private void DisposeWorkingFile(ref WorkingFile file)
         {
-            file.Invalidated -= File_Invalidated;
-            file.Saved -= File_Saved;
+            file.ChangesAccepted -= File_ChangesAccepted;
+            file.Invalidated     -= File_Invalidated;
 
             file.Dispose();
         }
@@ -208,16 +201,13 @@ namespace Oddmatics.Tools.BinPacker
             }
             catch (Exception ex)
             {
-                var errorDialog = new TaskDialog();
-
-                errorDialog.Caption = Application.ProductName;
-                errorDialog.Icon = TaskDialogStandardIcon.Error;
-                errorDialog.InstructionText = "Failed to generate the atlas.";
-                errorDialog.OwnerWindowHandle = this.Handle;
-                errorDialog.Text = ex.Message;
-                errorDialog.StandardButtons = TaskDialogStandardButtons.Ok;
-
-                errorDialog.Show();
+                MessageBox.Show(
+                    $"Failed to generate the atlas.{ex.Message}\n\n" +
+                    $"{ex.StackTrace}",
+                    Application.ProductName,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
             }
         }
 
@@ -226,31 +216,31 @@ namespace Oddmatics.Tools.BinPacker
         /// </summary>
         private void UpdateTitle()
         {
-            this.Text = String.Format(
+            this.Text = string.Format(
                 WindowTitleFormat,
                 Application.ProductName,
-                (String.IsNullOrEmpty(File.LastFileName) ? "Untitled" : File.LastFileName),
-                (File.IsUnsaved ? "*" : String.Empty)
-                );
+                (string.IsNullOrEmpty(File.LastFileName) ? "Untitled" : File.LastFileName),
+                (File.IsChanged ? "*" : string.Empty)
+            );
         }
 
 
         #region WorkingFile Events
 
         /// <summary>
-        /// (Event) Occurs when the current <see cref="WorkingFile"/> has its
-        /// previously saved copy invalidated.
+        /// (Event) Occurs when the current <see cref="WorkingFile"/> instance is
+        /// saved.
         /// </summary>
-        private void File_Invalidated(object sender, EventArgs e)
+        private void File_ChangesAccepted(object sender, EventArgs e)
         {
             UpdateTitle();
         }
 
         /// <summary>
-        /// (Event) Occurs when the current <see cref="WorkingFile"/> instance is
-        /// saved.
+        /// (Event) Occurs when the current <see cref="WorkingFile"/> has its
+        /// previously saved copy invalidated.
         /// </summary>
-        private void File_Saved(object sender, EventArgs e)
+        private void File_Invalidated(object sender, EventArgs e)
         {
             UpdateTitle();
         }
@@ -275,7 +265,7 @@ namespace Oddmatics.Tools.BinPacker
                 File.AddFile(openDialog.FileName);
                 TextureBinListBox.Items.Add(
                     Path.GetFileNameWithoutExtension(openDialog.FileName)
-                    );
+                );
             }
         }
 
@@ -342,11 +332,11 @@ namespace Oddmatics.Tools.BinPacker
         /// </summary>
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            TaskDialogResult shouldSaveFirst = CheckDiscard();
+            DialogResult shouldSaveFirst = CheckDiscard();
 
             switch (shouldSaveFirst)
             {
-                case TaskDialogResult.Yes:
+                case DialogResult.Yes:
                     bool saveOccurred = Save(File.LastFileName);
 
                     if (!saveOccurred)
@@ -354,7 +344,7 @@ namespace Oddmatics.Tools.BinPacker
 
                     break;
 
-                case TaskDialogResult.Cancel:
+                case DialogResult.Cancel:
                     e.Cancel = true;
                     break;
             }

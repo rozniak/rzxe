@@ -1,3 +1,6 @@
 [submodule "submodules/Pencil.Gaming"]
 	path = submodules/Pencil.Gaming
 	url = https://github.com/rozniak/Pencil.Gaming.git
+[submodule "submodules/Oddmatics-Util"]
+	path = submodules/Oddmatics-Util
+	url = https://github.com/rozniak/Oddmatics-Util.git

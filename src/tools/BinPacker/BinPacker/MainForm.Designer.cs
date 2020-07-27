@@ -1,4 +1,6 @@
-﻿namespace Oddmatics.Tools.BinPacker
+﻿using System.Resources;
+
+namespace Oddmatics.Tools.BinPacker
 {
     partial class MainForm
     {
@@ -37,7 +39,11 @@
             this.ResourceSplitView = new System.Windows.Forms.SplitContainer();
             this.ResourceBinTreeView = new System.Windows.Forms.TreeView();
             this.ResourcesImageList = new System.Windows.Forms.ImageList(this.components);
+            this.ResourceBinTitlePanel = new System.Windows.Forms.Panel();
+            this.ResourceBinTitleLabel = new System.Windows.Forms.Label();
             this.TextureBinListBox = new System.Windows.Forms.ListBox();
+            this.TextureBinTitlePanel = new System.Windows.Forms.Panel();
+            this.TextureBinTitleLabel = new System.Windows.Forms.Label();
             this.TextureBinManagementPanel = new System.Windows.Forms.Panel();
             this.TextureBinRefreshButton = new System.Windows.Forms.Button();
             this.TextureBinRemoveButton = new System.Windows.Forms.Button();
@@ -54,10 +60,6 @@
             this.CanvasAtlasSizeMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.HelpMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.HelpAboutMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.TextureBinTitlePanel = new System.Windows.Forms.Panel();
-            this.TextureBinTitleLabel = new System.Windows.Forms.Label();
-            this.ResourceBinTitlePanel = new System.Windows.Forms.Panel();
-            this.ResourceBinTitleLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.RenderTarget)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.UiSplitView)).BeginInit();
             this.UiSplitView.Panel1.SuspendLayout();
@@ -67,10 +69,10 @@
             this.ResourceSplitView.Panel1.SuspendLayout();
             this.ResourceSplitView.Panel2.SuspendLayout();
             this.ResourceSplitView.SuspendLayout();
+            this.ResourceBinTitlePanel.SuspendLayout();
+            this.TextureBinTitlePanel.SuspendLayout();
             this.TextureBinManagementPanel.SuspendLayout();
             this.MainMenu.SuspendLayout();
-            this.TextureBinTitlePanel.SuspendLayout();
-            this.ResourceBinTitlePanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // RenderTarget
@@ -147,10 +149,29 @@
             // 
             // ResourcesImageList
             // 
+            this.ResourcesImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
             this.ResourcesImageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("ResourcesImageList.ImageStream")));
             this.ResourcesImageList.TransparentColor = System.Drawing.Color.Transparent;
             this.ResourcesImageList.Images.SetKeyName(0, "Font_16x16.png");
             this.ResourcesImageList.Images.SetKeyName(1, "BorderBox_16x16.png");
+            // 
+            // ResourceBinTitlePanel
+            // 
+            this.ResourceBinTitlePanel.Controls.Add(this.ResourceBinTitleLabel);
+            this.ResourceBinTitlePanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.ResourceBinTitlePanel.Location = new System.Drawing.Point(0, 0);
+            this.ResourceBinTitlePanel.Name = "ResourceBinTitlePanel";
+            this.ResourceBinTitlePanel.Size = new System.Drawing.Size(256, 24);
+            this.ResourceBinTitlePanel.TabIndex = 3;
+            // 
+            // ResourceBinTitleLabel
+            // 
+            this.ResourceBinTitleLabel.AutoSize = true;
+            this.ResourceBinTitleLabel.Location = new System.Drawing.Point(4, 5);
+            this.ResourceBinTitleLabel.Name = "ResourceBinTitleLabel";
+            this.ResourceBinTitleLabel.Size = new System.Drawing.Size(57, 13);
+            this.ResourceBinTitleLabel.TabIndex = 1;
+            this.ResourceBinTitleLabel.Text = "Resources";
             // 
             // TextureBinListBox
             // 
@@ -161,6 +182,24 @@
             this.TextureBinListBox.Size = new System.Drawing.Size(256, 161);
             this.TextureBinListBox.TabIndex = 1;
             this.TextureBinListBox.SelectedIndexChanged += new System.EventHandler(this.NodeListBox_SelectedIndexChanged);
+            // 
+            // TextureBinTitlePanel
+            // 
+            this.TextureBinTitlePanel.Controls.Add(this.TextureBinTitleLabel);
+            this.TextureBinTitlePanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.TextureBinTitlePanel.Location = new System.Drawing.Point(0, 0);
+            this.TextureBinTitlePanel.Name = "TextureBinTitlePanel";
+            this.TextureBinTitlePanel.Size = new System.Drawing.Size(256, 24);
+            this.TextureBinTitlePanel.TabIndex = 2;
+            // 
+            // TextureBinTitleLabel
+            // 
+            this.TextureBinTitleLabel.AutoSize = true;
+            this.TextureBinTitleLabel.Location = new System.Drawing.Point(4, 5);
+            this.TextureBinTitleLabel.Name = "TextureBinTitleLabel";
+            this.TextureBinTitleLabel.Size = new System.Drawing.Size(62, 13);
+            this.TextureBinTitleLabel.TabIndex = 0;
+            this.TextureBinTitleLabel.Text = "Texture Bin";
             // 
             // TextureBinManagementPanel
             // 
@@ -302,42 +341,6 @@
             this.HelpAboutMenuItem.Text = "&About Bin Packer Tool...";
             this.HelpAboutMenuItem.Click += new System.EventHandler(this.HelpAboutMenuItem_Click);
             // 
-            // TextureBinTitlePanel
-            // 
-            this.TextureBinTitlePanel.Controls.Add(this.TextureBinTitleLabel);
-            this.TextureBinTitlePanel.Dock = System.Windows.Forms.DockStyle.Top;
-            this.TextureBinTitlePanel.Location = new System.Drawing.Point(0, 0);
-            this.TextureBinTitlePanel.Name = "TextureBinTitlePanel";
-            this.TextureBinTitlePanel.Size = new System.Drawing.Size(256, 24);
-            this.TextureBinTitlePanel.TabIndex = 2;
-            // 
-            // TextureBinTitleLabel
-            // 
-            this.TextureBinTitleLabel.AutoSize = true;
-            this.TextureBinTitleLabel.Location = new System.Drawing.Point(4, 5);
-            this.TextureBinTitleLabel.Name = "TextureBinTitleLabel";
-            this.TextureBinTitleLabel.Size = new System.Drawing.Size(61, 13);
-            this.TextureBinTitleLabel.TabIndex = 0;
-            this.TextureBinTitleLabel.Text = "Texture Bin";
-            // 
-            // ResourceBinTitlePanel
-            // 
-            this.ResourceBinTitlePanel.Controls.Add(this.ResourceBinTitleLabel);
-            this.ResourceBinTitlePanel.Dock = System.Windows.Forms.DockStyle.Top;
-            this.ResourceBinTitlePanel.Location = new System.Drawing.Point(0, 0);
-            this.ResourceBinTitlePanel.Name = "ResourceBinTitlePanel";
-            this.ResourceBinTitlePanel.Size = new System.Drawing.Size(256, 24);
-            this.ResourceBinTitlePanel.TabIndex = 3;
-            // 
-            // ResourceBinTitleLabel
-            // 
-            this.ResourceBinTitleLabel.AutoSize = true;
-            this.ResourceBinTitleLabel.Location = new System.Drawing.Point(4, 5);
-            this.ResourceBinTitleLabel.Name = "ResourceBinTitleLabel";
-            this.ResourceBinTitleLabel.Size = new System.Drawing.Size(58, 13);
-            this.ResourceBinTitleLabel.TabIndex = 1;
-            this.ResourceBinTitleLabel.Text = "Resources";
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -363,13 +366,13 @@
             this.ResourceSplitView.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.ResourceSplitView)).EndInit();
             this.ResourceSplitView.ResumeLayout(false);
+            this.ResourceBinTitlePanel.ResumeLayout(false);
+            this.ResourceBinTitlePanel.PerformLayout();
+            this.TextureBinTitlePanel.ResumeLayout(false);
+            this.TextureBinTitlePanel.PerformLayout();
             this.TextureBinManagementPanel.ResumeLayout(false);
             this.MainMenu.ResumeLayout(false);
             this.MainMenu.PerformLayout();
-            this.TextureBinTitlePanel.ResumeLayout(false);
-            this.TextureBinTitlePanel.PerformLayout();
-            this.ResourceBinTitlePanel.ResumeLayout(false);
-            this.ResourceBinTitlePanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 

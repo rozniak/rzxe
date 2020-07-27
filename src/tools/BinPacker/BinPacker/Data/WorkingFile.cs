@@ -1,7 +1,10 @@
 ﻿using Oddmatics.Tools.BinPacker.Algorithm;
+using Oddmatics.Util.Collections;
+using Oddmatics.Util.System;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -12,26 +15,8 @@ namespace Oddmatics.Tools.BinPacker.Data
     /// <summary>
     /// Represents the working file in this application.
     /// </summary>
-    internal sealed class WorkingFile : IDisposable
+    internal sealed class WorkingFile : ChangeTrackingEx, IDisposable
     {
-        /// <summary>
-        /// Gets the value that indicates whether there is unsaved data in this file.
-        /// </summary>
-        public bool IsUnsaved
-        {
-            get { return _IsUnsaved; }
-            private set
-            {
-                _IsUnsaved = value;
-
-                if (_IsUnsaved)
-                    Invalidated?.Invoke(this, EventArgs.Empty);
-                else
-                    Saved?.Invoke(this, EventArgs.Empty);
-            }
-        }
-        private bool _IsUnsaved;
-
         /// <summary>
         /// Gets the full file path last used when saving this file.
         /// </summary>
@@ -50,27 +35,23 @@ namespace Oddmatics.Tools.BinPacker.Data
 
 
         /// <summary>
-        /// Occurs when the saved version of this file is invalidated.
-        /// </summary>
-        public event EventHandler Invalidated;
-
-        /// <summary>
-        /// Occurs when this file has been saved.
-        /// </summary>
-        public event EventHandler Saved;
-
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="WorkingFile"/> class.
         /// </summary>
         public WorkingFile()
         {
-            _IsUnsaved = true;
             Atlas = new BitmapBinPacker();
             LastFileName = String.Empty;
             SourceFiles = new List<string>();
         }
 
+
+        /// <summary>
+        /// Resets the object's state to unchanged by accepting the modifications.
+        /// </summary>
+        public override void AcceptChanges()
+        {
+            Save(LastFileName);
+        }
 
         /// <summary>
         /// Adds a file to the working source files.
@@ -79,7 +60,7 @@ namespace Oddmatics.Tools.BinPacker.Data
         public void AddFile(string fullFilePath)
         {
             SourceFiles.Add(fullFilePath);
-            IsUnsaved = true;
+            IsChanged = true;
         }
 
         /// <summary>
@@ -121,7 +102,7 @@ namespace Oddmatics.Tools.BinPacker.Data
         public void RemoveFileByIndex(int index)
         {
             SourceFiles.RemoveAt(index);
-            IsUnsaved = true;
+            IsChanged = true;
         }
 
         /// <summary>
@@ -133,7 +114,7 @@ namespace Oddmatics.Tools.BinPacker.Data
             Atlas.Save(fullFilePath);
 
             LastFileName = fullFilePath;
-            IsUnsaved = false;
+            IsChanged = false;
         }
 
         /// <summary>
@@ -143,7 +124,7 @@ namespace Oddmatics.Tools.BinPacker.Data
         public void SetAtlasSize(Size newSize)
         {
             Atlas.Size = newSize;
-            IsUnsaved = true;
+            IsChanged = true;
         }
     }
 }

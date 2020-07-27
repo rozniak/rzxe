@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Oddmatics.Tools.BinPacker.Metadata;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -21,21 +20,10 @@ namespace Oddmatics.Tools.BinPacker.Algorithm
         public Bitmap Bitmap { get; private set; }
 
         /// <summary>
-        /// Gets or sets the available border-boxes in this
-        /// <see cref="BitmapBinPacker"/>.
-        /// </summary>
-        public List<BorderBoxResource> BorderBoxes { get; private set; }
-
-        /// <summary>
         /// Gets the value that indicates whether this <see cref="BitmapBinPacker"/>
         /// has been disposed or not.
         /// </summary>
         public bool Disposed { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the available fonts in this <see cref="BitmapBinPacker"/>.
-        /// </summary>
-        public List<FontResource> Fonts { get; private set; }
 
         /// <summary>
         /// Gets or sets the size of the atlas.
