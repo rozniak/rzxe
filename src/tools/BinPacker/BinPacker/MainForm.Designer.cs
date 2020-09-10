@@ -31,8 +31,6 @@ namespace Oddmatics.Tools.BinPacker
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Fonts");
-            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Border Boxes", 1, 1);
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.RenderTarget = new System.Windows.Forms.PictureBox();
             this.UiSplitView = new System.Windows.Forms.SplitContainer();
@@ -133,27 +131,19 @@ namespace Oddmatics.Tools.BinPacker
             this.ResourceBinTreeView.ImageList = this.ResourcesImageList;
             this.ResourceBinTreeView.Location = new System.Drawing.Point(0, 24);
             this.ResourceBinTreeView.Name = "ResourceBinTreeView";
-            treeNode1.ImageIndex = 0;
-            treeNode1.Name = "FontRootNode";
-            treeNode1.Text = "Fonts";
-            treeNode2.ImageIndex = 1;
-            treeNode2.Name = "BorderBoxRoot";
-            treeNode2.SelectedImageIndex = 1;
-            treeNode2.Text = "Border Boxes";
-            this.ResourceBinTreeView.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode1,
-            treeNode2});
             this.ResourceBinTreeView.SelectedImageIndex = 0;
             this.ResourceBinTreeView.Size = new System.Drawing.Size(256, 201);
             this.ResourceBinTreeView.TabIndex = 2;
+            this.ResourceBinTreeView.MouseClick += new System.Windows.Forms.MouseEventHandler(this.ResourceBinTreeView_MouseClick);
             // 
             // ResourcesImageList
             // 
             this.ResourcesImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
             this.ResourcesImageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("ResourcesImageList.ImageStream")));
             this.ResourcesImageList.TransparentColor = System.Drawing.Color.Transparent;
-            this.ResourcesImageList.Images.SetKeyName(0, "Font_16x16.png");
-            this.ResourcesImageList.Images.SetKeyName(1, "BorderBox_16x16.png");
+            this.ResourcesImageList.Images.SetKeyName(0, "BorderBox_16x16.png");
+            this.ResourcesImageList.Images.SetKeyName(1, "Font_16x16.png");
+            this.ResourcesImageList.Images.SetKeyName(2, "Resource_16x16.png");
             // 
             // ResourceBinTitlePanel
             // 

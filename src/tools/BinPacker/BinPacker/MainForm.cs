@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Oddmatics.Tools.BinPacker.Algorithm;
+using Oddmatics.Tools.BinPacker.Controls;
 using Oddmatics.Tools.BinPacker.Data;
 using Oddmatics.Tools.BinPacker.Dialogs;
+using Oddmatics.Util.System;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,6 +11,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -27,9 +30,29 @@ namespace Oddmatics.Tools.BinPacker
 
 
         /// <summary>
+        /// The root tree node for border box resources.
+        /// </summary>
+        private ResourceTreeNode BorderBoxRootNode { get; set; }
+
+        /// <summary>
         /// The working file.
         /// </summary>
-        private WorkingFile File;
+        private WorkingFile File { get; set; }
+
+        /// <summary>
+        /// The root tree node for font resources.
+        /// </summary>
+        private ResourceTreeNode FontRootNode { get; set; }
+
+        /// <summary>
+        /// The context menu for the root node of the resource tree.
+        /// </summary>
+        private ResourceContextMenuStrip ResourceContextMenuStrip { get; set; }
+
+        /// <summary>
+        /// The context menu for item nodes of the resource tree.
+        /// </summary>
+        private ResourceItemContextMenuStrip ResourceItemContextMenuStrip { get; set; }
 
 
         /// <summary>
@@ -38,6 +61,7 @@ namespace Oddmatics.Tools.BinPacker
         public MainForm()
         {
             InitializeComponent();
+            InitializeResourceContextMenus();
         }
 
 
@@ -84,8 +108,16 @@ namespace Oddmatics.Tools.BinPacker
 
             File.SetAtlasSize(newAtlasSize);
 
-            File.ChangesAccepted += File_ChangesAccepted;
-            File.Invalidated += File_Invalidated;
+            File.ChangesAccepted                += File_ChangesAccepted;
+            File.Invalidated                    += File_Invalidated;
+
+            File.BorderBoxResources.Cleared     += File_BorderBoxesCleared;
+            File.BorderBoxResources.ItemAdded   += File_BorderBoxAdded;
+            File.BorderBoxResources.ItemRemoved += File_BorderBoxRemoved;
+
+            File.FontResources.Cleared          += File_FontsCleared;
+            File.FontResources.ItemAdded        += File_FontAdded;
+            File.FontResources.ItemRemoved      += File_FontRemoved;
 
             // Update the form
             //
@@ -99,6 +131,10 @@ namespace Oddmatics.Tools.BinPacker
             {
                 DisposeWorkingFile(ref oldFile);
             }
+
+            // Initialize UI
+            //
+            InitializeResourceTreeView();
         }
 
         /// <summary>
@@ -183,10 +219,77 @@ namespace Oddmatics.Tools.BinPacker
         /// </param>
         private void DisposeWorkingFile(ref WorkingFile file)
         {
-            file.ChangesAccepted -= File_ChangesAccepted;
-            file.Invalidated     -= File_Invalidated;
+            file.ChangesAccepted                -= File_ChangesAccepted;
+            file.Invalidated                    -= File_Invalidated;
+
+            file.BorderBoxResources.Cleared     -= File_BorderBoxesCleared;
+            file.BorderBoxResources.ItemAdded   -= File_BorderBoxAdded;
+            file.BorderBoxResources.ItemRemoved -= File_BorderBoxRemoved;
+
+            file.FontResources.Cleared          -= File_FontsCleared;
+            file.FontResources.ItemAdded        -= File_FontAdded;
+            file.FontResources.ItemRemoved      -= File_FontRemoved;
 
             file.Dispose();
+        }
+
+        /// <summary>
+        /// Initializes the context menus for the resource tree.
+        /// </summary>
+        private void InitializeResourceContextMenus()
+        {
+            ResourceContextMenuStrip     = new ResourceContextMenuStrip();
+            ResourceItemContextMenuStrip = new ResourceItemContextMenuStrip();
+
+            ResourceContextMenuStrip.AddMenuItem.Click            +=
+                AddResourceContextMenuItem_Click;
+            ResourceItemContextMenuStrip.DeleteMenuItem.Click     +=
+                DeleteResourceContextMenuItem_Click;
+            ResourceItemContextMenuStrip.PropertiesMenuItem.Click +=
+                PropertiesResourceContextMenuItem_Click;
+            ResourceItemContextMenuStrip.RenameMenuItem.Click     +=
+                RenameResourceContextMenuItem_Click;
+        }
+
+        /// <summary>
+        /// Initializes the tree view.
+        /// </summary>
+        private void InitializeResourceTreeView()
+        {
+            BorderBoxRootNode =
+                new ResourceTreeNode(BinPackerResourceKind.BorderBox)
+                {
+                    ImageIndex         = 0,
+                    SelectedImageIndex = 0
+                };
+            FontRootNode      =
+                new ResourceTreeNode(BinPackerResourceKind.Font)
+                {
+                    ImageIndex         = 1,
+                    SelectedImageIndex = 1
+                };
+
+            ResourceBinTreeView.Nodes.Clear();
+
+            ResourceBinTreeView.Nodes.Add(BorderBoxRootNode);
+            ResourceBinTreeView.Nodes.Add(FontRootNode);
+        }
+
+        /// <summary>
+        /// Opens a <see cref="SpriteMappingDialog"/> for editing the specified
+        /// resource.
+        /// </summary>
+        /// <param name="resource">
+        /// The resource.
+        /// </param>
+        private void OpenResourceSpriteMapping(MetaResource resource)
+        {
+            using (var dialog = new SpriteMappingDialog(resource))
+            {
+                dialog.SourceFiles = File.SourceFiles;
+
+
+            }
         }
 
         /// <summary>
@@ -225,24 +328,114 @@ namespace Oddmatics.Tools.BinPacker
         }
 
 
-        #region WorkingFile Events
+        #region Context Menu Events
 
         /// <summary>
-        /// (Event) Occurs when the current <see cref="WorkingFile"/> instance is
-        /// saved.
+        /// (Event) Occurs when the 'Add' button on the resource context menu is
+        /// clicked.
         /// </summary>
-        private void File_ChangesAccepted(object sender, EventArgs e)
+        private void AddResourceContextMenuItem_Click(object sender, EventArgs e)
         {
-            UpdateTitle();
+            var uiItem = (ToolStripMenuItem) sender;
+            var uiMenu = (ResourceContextMenuStrip) uiItem.Owner;
+
+            // Handle name entry dialog
+            //
+            MetaResource resource = null;
+
+            using (var dialog = new NameEntryDialog())
+            {
+                bool exitLoop = false;
+
+                while (!exitLoop)
+                {
+                    if (dialog.ShowDialog() == DialogResult.OK)
+                    {
+                        var exceptionDr = DialogResult.Retry;
+
+                        try
+                        {
+                            resource = new MetaResource(uiMenu.Context, dialog.NameEntered);
+
+                            switch (uiMenu.Context)
+                            {
+                                case BinPackerResourceKind.BorderBox:
+                                    File.BorderBoxResources.Add(resource);
+                                    break;
+
+                                case BinPackerResourceKind.Font:
+                                    File.FontResources.Add(resource);
+                                    break;
+                            }
+
+                            exitLoop = true;
+                        }
+                        catch (ArgumentException argEx)
+                        {
+                            exceptionDr =
+                                MessageBox.Show(
+                                    $"Failed to create resource: {argEx.Message}",
+                                    Application.ProductName,
+                                    MessageBoxButtons.RetryCancel,
+                                    MessageBoxIcon.Warning
+                                );
+                        }
+                        catch (ValidationFailureException validationEx)
+                        {
+                            exceptionDr =
+                                MessageBox.Show(
+                                    $"The resource name was invalid: {validationEx.Reason}",
+                                    Application.ProductName,
+                                    MessageBoxButtons.RetryCancel,
+                                    MessageBoxIcon.Warning
+                                );
+                        }
+
+                        if (exceptionDr == DialogResult.Cancel)
+                        {
+                            exitLoop = true;
+                        }
+                    }
+                    else
+                    {
+                        exitLoop = true;
+                    }
+                }
+            }
+
+            // Made a resource? Edit it now
+            //
+            if (resource != null)
+            {
+
+            }
         }
 
         /// <summary>
-        /// (Event) Occurs when the current <see cref="WorkingFile"/> has its
-        /// previously saved copy invalidated.
+        /// (Event) Occurs when the 'Delete' button on the resource item context menu
+        /// is clicked.
         /// </summary>
-        private void File_Invalidated(object sender, EventArgs e)
+        private void DeleteResourceContextMenuItem_Click(object sender, EventArgs e)
         {
-            UpdateTitle();
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// (Event) Occurs when the 'Properties' button on the resource item context
+        /// menu is clicked.
+        /// </summary>
+        private void PropertiesResourceContextMenuItem_Click(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// (Event) Occurs when the 'Rename' button on the resource item context menu
+        /// is clicked.
+        /// </summary>
+        private void RenameResourceContextMenuItem_Click(object sender, EventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
@@ -262,7 +455,7 @@ namespace Oddmatics.Tools.BinPacker
 
             if (openDialog.ShowDialog() == DialogResult.OK)
             {
-                File.AddFile(openDialog.FileName);
+                File.SourceFiles.Add(openDialog.FileName);
                 TextureBinListBox.Items.Add(
                     Path.GetFileNameWithoutExtension(openDialog.FileName)
                 );
@@ -381,8 +574,139 @@ namespace Oddmatics.Tools.BinPacker
         /// </summary>
         private void RemoveButton_Click(object sender, EventArgs e)
         {
-            File.RemoveFileByIndex(TextureBinListBox.SelectedIndex);
+            File.SourceFiles.RemoveAt(TextureBinListBox.SelectedIndex);
             TextureBinListBox.Items.RemoveAt(TextureBinListBox.SelectedIndex);
+        }
+
+        /// <summary>
+        /// (Event) Occurs when the resource bin is clicked.
+        /// </summary>
+        private void ResourceBinTreeView_MouseClick(object sender, MouseEventArgs e)
+        {
+            var treeView = (TreeView) sender;
+
+            // Handle hit test and selection
+            //
+            TreeViewHitTestInfo hitTest  = treeView.HitTest(e.X, e.Y);
+            var                 treeNode = (ResourceTreeNode) hitTest.Node;
+
+            if (treeNode == null)
+            {
+                return;
+            }
+
+            if (treeView.SelectedNode != treeNode)
+            {
+                treeView.SelectedNode = treeNode;
+            }
+
+            // Handle context menu
+            //
+            if (e.Button == MouseButtons.Right)
+            {
+                // Is this a root node or an item?
+                //
+                if (treeNode.Resource == null)
+                {
+                    ResourceContextMenuStrip.Show(
+                        Cursor.Position,
+                        treeNode.ResourceKind
+                    );
+                }
+                else
+                {
+                    ResourceItemContextMenuStrip.Show(
+                        Cursor.Position,
+                        treeNode.Resource
+                    );
+                }
+            }
+        }
+
+        #endregion
+
+
+        #region WorkingFile Events
+
+        /// <summary>
+        /// (Event) Occurs when a border box resource is added to the working file.
+        /// </summary>
+        private void File_BorderBoxAdded(object sender, ItemChangedEventArgs<MetaResource> e)
+        {
+            BorderBoxRootNode.Nodes.Insert(
+                e.ItemIndex,
+                new ResourceTreeNode(e.ItemChanged)
+                {
+                    ImageIndex         = 2,
+                    SelectedImageIndex = 2
+                }
+            );
+        }
+
+        /// <summary>
+        /// (Event) Occurs when all border box resources are cleared from the working
+        /// file.
+        /// </summary>
+        private void File_BorderBoxesCleared(object sender, EventArgs e)
+        {
+            BorderBoxRootNode.Nodes.Clear();
+        }
+
+        /// <summary>
+        /// (Event) Occurs when a border box resource is removed from the working file.
+        /// </summary>
+        private void File_BorderBoxRemoved(object sender, ItemChangedEventArgs<MetaResource> e)
+        {
+            BorderBoxRootNode.Nodes.RemoveAt(e.ItemIndex);
+        }
+
+        /// <summary>
+        /// (Event) Occurs when the current <see cref="WorkingFile"/> instance is
+        /// saved.
+        /// </summary>
+        private void File_ChangesAccepted(object sender, EventArgs e)
+        {
+            UpdateTitle();
+        }
+
+        /// <summary>
+        /// (Event) Occurs when a font resource is added to the working file.
+        /// </summary>
+        private void File_FontAdded(object sender, ItemChangedEventArgs<MetaResource> e)
+        {
+            FontRootNode.Nodes.Insert(
+                e.ItemIndex,
+                new ResourceTreeNode(e.ItemChanged)
+                {
+                    ImageIndex         = 2,
+                    SelectedImageIndex = 2
+                }
+            );
+        }
+
+        /// <summary>
+        /// (Event) Occurs when a font resource is removed from the working file.
+        /// </summary>
+        private void File_FontRemoved(object sender, ItemChangedEventArgs<MetaResource> e)
+        {
+            FontRootNode.Nodes.RemoveAt(e.ItemIndex);
+        }
+
+        /// <summary>
+        /// (Event) Occurs when all font resources are cleared from the working file.
+        /// </summary>
+        private void File_FontsCleared(object sender, EventArgs e)
+        {
+            FontRootNode.Nodes.Clear();
+        }
+
+        /// <summary>
+        /// (Event) Occurs when the current <see cref="WorkingFile"/> has its
+        /// previously saved copy invalidated.
+        /// </summary>
+        private void File_Invalidated(object sender, EventArgs e)
+        {
+            UpdateTitle();
         }
 
         #endregion
