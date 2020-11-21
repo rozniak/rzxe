@@ -1,22 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
+﻿using System.Drawing;
 
 namespace Oddmatics.Rzxe.Windowing.Graphics
 {
     public interface ISpriteBatch
     {
-        void Draw(string spriteName, Point location);
+        ISpriteAtlas Atlas { get; }
+    
+    
+        void Draw(ISprite sprite, Point location);
     
         void Draw(Rectangle sourceRect, Point location);
     
-        void Draw(string spriteName, Rectangle rect, DrawMode drawMode);
+        void Draw(ISprite sprite, Rectangle destRect, DrawMode drawMode);
         
-        void Draw(Rectangle sourceRect, Rectangle rect, DrawMode drawMode);
-
-        void DrawBorderBox(string spriteName, Rectangle rect);
+        void Draw(Rectangle sourceRect, Rectangle destRect, DrawMode drawMode);
+    
+        void DrawBorderBox(IBorderBoxResource borderBox, Rectangle destRect);
         
         void DrawString(string text, string fontNameBase, Point location, int scale = 1);
 

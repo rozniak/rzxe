@@ -112,10 +112,9 @@ namespace Oddmatics.Rzxe.Game.Interface
         {
             // Render controls back-to-front
             //
-            var safeList = new List<UxComponent>(Components);
-            var sb       = graphics.CreateSpriteBatch(
-                               "shell-atlas"
-                           );
+            ISpriteAtlas atlas    = graphics.GetSpriteAtlas("shell");
+            var          safeList = new List<UxComponent>(Components);
+            ISpriteBatch sb       = graphics.CreateSpriteBatch(atlas);
 
             foreach (UxComponent component in safeList)
             {

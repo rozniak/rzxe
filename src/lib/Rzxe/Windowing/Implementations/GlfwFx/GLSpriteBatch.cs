@@ -12,6 +12,9 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
 {
     internal sealed class GLSpriteBatch : ISpriteBatch
     {
+        public ISpriteAtlas Atlas { get; private set; }
+    
+    
         private GLGraphicsController OwnerController { get; set; }
 
         #region GL Stuff
@@ -40,23 +43,21 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
 
         private GLResourceCache ResourceCache { get; set; }
 
-        private GLSpriteAtlas SpriteAtlas { get; set; }
-
         #endregion
 
         
         public GLSpriteBatch(
             GLGraphicsController owner,
-            string atlasName,
-            GLResourceCache resourceCache
-            )
+            GLSpriteAtlas        atlas,
+            GLResourceCache      resourceCache
+        )
         {
             OwnerController = owner;
 
             // Set up resource bits
             //
+            Atlas         = atlas;
             ResourceCache = resourceCache;
-            SpriteAtlas = ResourceCache.GetAtlas(atlasName);
 
             // Set up GL fields
             //
@@ -84,12 +85,12 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         
         
         public void Draw(
-            string spriteName,
-            Point  location
+            ISprite sprite,
+            Point   location
         )
         {
             Draw(
-                SpriteAtlas.GetSpriteUV(spriteName),
+                ((GLSprite) sprite).Bounds,
                 location
             );
         }
@@ -111,21 +112,21 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         }
 
         public void Draw(
-            string                   spriteName,
-            System.Drawing.Rectangle rect,
+            ISprite                  sprite,
+            System.Drawing.Rectangle destRect,
             DrawMode                 drawMode
         )
         {
             Draw(
-                SpriteAtlas.GetSpriteUV(spriteName),
-                rect,
+                ((GLSprite) sprite).Bounds,
+                destRect,
                 drawMode
             );
         }
         
         public void Draw(
             System.Drawing.Rectangle sourceRect,
-            System.Drawing.Rectangle rect,
+            System.Drawing.Rectangle destRect,
             DrawMode                 drawMode
         )
         {
@@ -136,14 +137,19 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                     sourceRect.Width,
                     sourceRect.Height
                 ),
-                rect,
+                new Rectanglei(
+                    destRect.X,
+                    destRect.Y,
+                    destRect.Width,
+                    destRect.Height
+                ),
                 drawMode
             );
         }
 
         public void DrawBorderBox(
-            string                   spriteName,
-            System.Drawing.Rectangle rect
+            IBorderBoxResource       borderBox,
+            System.Drawing.Rectangle destRect
         )
         {
             //
@@ -155,34 +161,32 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             // |    |    |
             // bl - bm - br
             //
-            Rectanglei tl = SpriteAtlas.GetSpriteUV(spriteName + "_tl");
-            Rectanglei tm = SpriteAtlas.GetSpriteUV(spriteName + "_tm");
-            Rectanglei tr = SpriteAtlas.GetSpriteUV(spriteName + "_tr");
-            Rectanglei ml = SpriteAtlas.GetSpriteUV(spriteName + "_ml");
-            Rectanglei mm = SpriteAtlas.GetSpriteUV(spriteName + "_mm");
-            Rectanglei mr = SpriteAtlas.GetSpriteUV(spriteName + "_mr");
-            Rectanglei bl = SpriteAtlas.GetSpriteUV(spriteName + "_bl");
-            Rectanglei bm = SpriteAtlas.GetSpriteUV(spriteName + "_bm");
-            Rectanglei br = SpriteAtlas.GetSpriteUV(spriteName + "_br");
+            var glBorderBox = (GLBorderBoxResource) borderBox;
+            
+            Rectanglei tl = glBorderBox.GetRect(BorderBoxSegment.TopLeft);
+            Rectanglei tm = glBorderBox.GetRect(BorderBoxSegment.TopMiddle);
+            Rectanglei tr = glBorderBox.GetRect(BorderBoxSegment.TopRight);
+            Rectanglei ml = glBorderBox.GetRect(BorderBoxSegment.MiddleLeft);
+            Rectanglei mm = glBorderBox.GetRect(BorderBoxSegment.MiddleMiddle);
+            Rectanglei mr = glBorderBox.GetRect(BorderBoxSegment.MiddleRight);
+            Rectanglei bl = glBorderBox.GetRect(BorderBoxSegment.BottomLeft);
+            Rectanglei bm = glBorderBox.GetRect(BorderBoxSegment.BottomMiddle);
+            Rectanglei br = glBorderBox.GetRect(BorderBoxSegment.BottomRight);
             
             // Top section
             //
             Draw(
                 tl,
-                rect.Location
+                destRect.Location
             );
             
             Draw(
                 tm,
-                new System.Drawing.Rectangle(
-                    new Point(
-                        rect.X + tl.Width,
-                        rect.Y
-                    ),
-                    new Size(
-                        rect.Width - tl.Width - tr.Width,
-                        tm.Height
-                    )
+                new Rectanglei(
+                    destRect.X + tl.Width,
+                    destRect.Y,
+                    destRect.Width - tl.Width - tr.Width,
+                    tm.Height
                 ),
                 DrawMode.Tiled
             );
@@ -190,8 +194,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             Draw(
                 tr,
                 new Point(
-                    rect.Right - tr.Width,
-                    rect.Y
+                    destRect.Right - tr.Width,
+                    destRect.Y
                 )
             );
             
@@ -199,45 +203,33 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             //
             Draw(
                 ml,
-                new System.Drawing.Rectangle(
-                    new Point(
-                        rect.X,
-                        rect.Y + tl.Height
-                    ),
-                    new Size(
-                        ml.Width,
-                        rect.Height - tl.Height - bl.Height
-                    )
+                new Rectanglei(
+                    destRect.X,
+                    destRect.Y + tl.Height,
+                    ml.Width,
+                    destRect.Height - tl.Height - bl.Height
                 ),
                 DrawMode.Tiled
             );
             
             Draw(
                 mm,
-                new System.Drawing.Rectangle(
-                    new Point(
-                        rect.X + tl.Width,
-                        rect.Y + tl.Height
-                    ),
-                    new Size(
-                        rect.Width - ml.Width - mr.Width,
-                        rect.Height - tm.Height - bm.Height
-                    )
+                new Rectanglei(
+                    destRect.X + tl.Width,
+                    destRect.Y + tl.Height,
+                    destRect.Width - ml.Width - mr.Width,
+                    destRect.Height - tm.Height - bm.Height
                 ),
                 DrawMode.Tiled
             );
             
             Draw(
                 mr,
-                new System.Drawing.Rectangle(
-                    new Point(
-                        rect.X + rect.Width - mr.Width,
-                        rect.Y + tr.Height
-                    ),
-                    new Size(
-                        mr.Width,
-                        rect.Height - tr.Height - br.Height
-                    )
+                new Rectanglei(
+                    destRect.X + destRect.Width - mr.Width,
+                    destRect.Y + tr.Height,
+                    mr.Width,
+                    destRect.Height - tr.Height - br.Height
                 ),
                 DrawMode.Tiled
             );
@@ -247,22 +239,18 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             Draw(
                 bl,
                 new Point(
-                    rect.X,
-                    rect.Bottom - bl.Height
+                    destRect.X,
+                    destRect.Bottom - bl.Height
                 )
             );
             
             Draw(
                 bm,
-                new System.Drawing.Rectangle(
-                    new Point(
-                        rect.X + bl.Width,
-                        rect.Bottom - bm.Height
-                    ),
-                    new Size(
-                        rect.Width - bl.Width - br.Width,
-                        bm.Height
-                    )
+                new Rectanglei(
+                    destRect.X + bl.Width,
+                    destRect.Bottom - bm.Height,
+                    destRect.Width - bl.Width - br.Width,
+                    bm.Height
                 ),
                 DrawMode.Tiled
             );
@@ -270,8 +258,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             Draw(
                 br,
                 new Point(
-                    rect.Right - br.Width,
-                    rect.Bottom - br.Height
+                    destRect.Right - br.Width,
+                    destRect.Bottom - br.Height
                 )
             );
         }
@@ -287,32 +275,25 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             
             foreach (char c in text)
             {
-                string     spriteName = string.Format(
-                                            "{0}_{1}",
-                                            fontBaseName,
-                                            c
-                                        );
-            
-                Rectanglei uv         = SpriteAtlas.GetSpriteUV(
-                                            spriteName
-                                        );
+                string spriteName = $"{fontBaseName}_{c}";
+                var    sprite     = (GLSprite) Atlas.Sprites[spriteName];
                 
                 Draw(
-                    spriteName,
+                    sprite,
                     new System.Drawing.Rectangle(
                         new Point(
                             x,
-                            location.Y - uv.Height * scale
+                            location.Y - sprite.Bounds.Height * scale
                         ),
                         new Size(
-                            uv.Width * scale,
-                            uv.Height * scale
+                            sprite.Bounds.Width * scale,
+                            sprite.Bounds.Height * scale
                         )
                     ),
                     DrawMode.Stretch
                 );
                 
-                x += uv.Width * scale + scale;
+                x += sprite.Bounds.Width * scale + scale;
             }
         }
 
@@ -384,14 +365,14 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             
             GL.Uniform2(
                 GlUvMapResolutionUniformId,
-                SpriteAtlas.Size
+                ((GLSpriteAtlas) Atlas).GlAtlasSize
             );
 
             // Bind the atlas
             //
             GL.BindTexture(
                 TextureTarget.Texture2D,
-                SpriteAtlas.GlTextureId
+                ((GLSpriteAtlas) Atlas).GlTextureId
             );
 
             // Assign attribs
@@ -503,29 +484,33 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         
         private void Draw(
             Rectanglei sourceRect,
-            Point      location        
+            Point      location,
+            DrawMode   drawMode = DrawMode.Stretch
         )
         {
             Draw(
                 sourceRect,
-                new System.Drawing.Rectangle(
-                    location,
-                    new Size(
+                new Rectanglei(
+                    new Vector2i(
+                        location.X,
+                        location.Y
+                    ),
+                    new Vector2i(
                         sourceRect.Width,
                         sourceRect.Height
                     )
                 ),
-                DrawMode.Stretch
+                drawMode
             );
         }
 
         private void Draw(
-            Rectanglei                sourceRect,
-            System.Drawing.Rectangle  rect,
-            DrawMode                  drawMode
+            Rectanglei sourceRect,
+            Rectanglei destRect,
+            DrawMode   drawMode
         )
         {
-            VboDrawContents.AddRange(GLUtility.MakeVboData(rect));
+            VboDrawContents.AddRange(GLUtility.MakeVboData(destRect));
             VboUvContents.AddRange(GLUtility.MakeVboData(sourceRect));
             
             VboSourceRects.AddRange(
@@ -533,7 +518,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             );
             
             VboOrigins.AddRange(
-                CloneVbo(MakeOriginData(rect.Location), 6)
+                CloneVbo(MakeOriginData(destRect.Position), 6)
             );
             
             VboDrawModes.AddRange(
@@ -544,13 +529,13 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         }
         
         private IList<float> MakeOriginData(
-            Point origin        
+            Vector2i origin        
         )
         {
             var data = new List<float>();
             
-            data.Add((float) origin.X);
-            data.Add((float) origin.Y);
+            data.Add(origin.X);
+            data.Add(origin.Y);
             
             return data;
         }

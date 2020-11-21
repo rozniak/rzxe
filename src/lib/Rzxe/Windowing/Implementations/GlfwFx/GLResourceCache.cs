@@ -1,4 +1,5 @@
 ﻿using Oddmatics.Rzxe.Game;
+using Oddmatics.Rzxe.Windowing.Graphics;
 using Pencil.Gaming.Graphics;
 using System;
 using System.Collections.Generic;
@@ -43,14 +44,14 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             }
             else
             {
-                var newAtlas = GLSpriteAtlas.FromFileSet(
-                    string.Format(
-                        "{0}{2}Atlas{2}{1}",
-                        EngineParameters.GameContentRoot,
-                        atlasName,
-                        Path.DirectorySeparatorChar
-                    )
-                );
+                var newAtlas =
+                    GLSpriteAtlas.FromFileSet(
+                        Path.Combine(
+                            EngineParameters.GameContentRoot,
+                            "Atlas"
+                        ),
+                        atlasName
+                    );
 
                 Atlases.Add(newAtlas.Name, newAtlas);
 

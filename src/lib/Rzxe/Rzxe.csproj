@@ -69,6 +69,15 @@
     <Compile Include="Windowing\Implementations\GlfwFx\GLUtility.cs" />
     <Compile Include="Windowing\IWindowManager.cs" />
     <Compile Include="Windowing\Graphics\DrawMode.cs" />
+    <Compile Include="Windowing\Graphics\Models\SpriteMappingModel.cs" />
+    <Compile Include="Windowing\Graphics\Models\BorderBoxModel.cs" />
+    <Compile Include="Windowing\Graphics\IBorderBoxResource.cs" />
+    <Compile Include="Windowing\Graphics\ISpriteAtlas.cs" />
+    <Compile Include="Windowing\Graphics\ISprite.cs" />
+    <Compile Include="Windowing\Graphics\Models\AtlasModel.cs" />
+    <Compile Include="Windowing\Implementations\GlfwFx\GLSprite.cs" />
+    <Compile Include="Windowing\Implementations\GlfwFx\GLBorderBoxResource.cs" />
+    <Compile Include="Windowing\Graphics\BorderBoxSegment.cs" />
   </ItemGroup>
   <ItemGroup>
     <ContentWithTargetPath Include="Windowing\Implementations\GlfwFx\Shaders\fragment.glsl">
@@ -88,6 +97,9 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Windowing\Graphics\Models\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
