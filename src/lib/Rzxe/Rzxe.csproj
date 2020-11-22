@@ -49,7 +49,7 @@
   <ItemGroup>
     <Compile Include="GameEntryPoint.cs" />
     <Compile Include="Game\GameState.cs" />
-    <Compile Include="Game\GameEngine.cs" />
+    <Compile Include="Game\IGameEngine.cs" />
     <Compile Include="Game\IGameEngineParameters.cs" />
     <Compile Include="Game\Interface\UxComponent.cs" />
     <Compile Include="Game\Interface\UxShell.cs" />

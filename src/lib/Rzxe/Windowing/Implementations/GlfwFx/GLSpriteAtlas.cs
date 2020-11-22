@@ -1,4 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿/**
+ * GLSpriteAtlas.cs - OpenGL Sprite Atlas Implementation
+ *
+ * This source-code is part of rzxe - an experimental game engine by Oddmatics:
+ * <<https://www.oddmatics.uk>>
+ *
+ * Author(s): Rory Fewell <roryf@oddmatics.uk>
+ */
+
+using Newtonsoft.Json;
 using Oddmatics.Rzxe.Windowing.Graphics;
 using Oddmatics.Rzxe.Windowing.Graphics.Models;
 using Pencil.Gaming.Graphics;
@@ -7,39 +16,64 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Collections.ObjectModel;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
 {
+    /// <summary>
+    /// The OpenGL implementation of the sprite atlas interface.
+    /// </summary>
     internal sealed class GLSpriteAtlas : ISpriteAtlas, IDisposable
     {
+        /// <inheritdoc />
         public IReadOnlyDictionary<string, IBorderBoxResource> BorderBoxes
         {
             get;
             private set;
         }
         
+        /// <summary>
+        /// Gets the size of the atlas.
+        /// </summary>
         public Vector2 GlAtlasSize { get; private set; }
-    
+        
+        /// <summary>
+        /// Gets the ID of the texture in OpenGL.
+        /// </summary>
         public int GlTextureId { get; private set; }
-
+        
+        /// <inheritdoc />
         public string Name { get; private set; }
-
+        
+        /// <inheritdoc />
         public Size Size
         {
             get { return new Size((int) GlAtlasSize.X, (int) GlAtlasSize.Y); }
         }
-
-        public IReadOnlyDictionary<string, ISprite> Sprites { get; private set; }
-
-
-        private bool Disposing { get; set; }
-
         
-
+        /// <inheritdoc />
+        public IReadOnlyDictionary<string, ISprite> Sprites { get; private set; }
+        
+        
+        /// <summary>
+        /// The value that indicates whether the class is disposing or has been
+        /// disposed.
+        /// </summary>
+        private bool Disposing { get; set; }
+        
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GLSpriteAtlas"/> class.
+        /// </summary>
+        /// <param name="name">
+        /// The name of the atlas.
+        /// </param>
+        /// <param name="model">
+        /// The data model of the sprite atlas.
+        /// </param>
+        /// <param name="bitmap">
+        /// The sprite atlas bitmap.
+        /// </param>
         private GLSpriteAtlas(
             string     name,
             AtlasModel model,
@@ -84,8 +118,9 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             
             bitmap.Dispose();
         }
-
-
+        
+        
+        /// <inheritdoc />
         public void Dispose()
         {
             if (Disposing)
@@ -97,9 +132,24 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
 
             GL.DeleteTexture(GlTextureId);
         }
-
-
-        internal static GLSpriteAtlas FromFileSet(string searchRoot, string name)
+        
+        
+        /// <summary>
+        /// Creates a <see cref="GLSpriteAtlas"/> from the specified file set.
+        /// </summary>
+        /// <param name="searchRoot">
+        /// The directory path of the root to search for the atlas file set.
+        /// </param>
+        /// <param name="name">
+        /// The name of the atlas.
+        /// </param>
+        /// <returns>
+        /// The <see cref="GLSpriteAtlas"/> this method creates.
+        /// </returns>
+        internal static GLSpriteAtlas FromFileSet(
+            string searchRoot,
+            string name
+        )
         {
             // Read texture atlas information and bitmap data
             //

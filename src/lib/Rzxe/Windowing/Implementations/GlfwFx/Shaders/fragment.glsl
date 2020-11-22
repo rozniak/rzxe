@@ -1,4 +1,13 @@
-﻿#version 330 core
+﻿/**
+ * fragment.glsl - Default Fragment Shader
+ *
+ * This source-code is part of rzxe - an experimental game engine by Oddmatics:
+ * <<https://www.oddmatics.uk>>
+ *
+ * Author(s): Rory Fewell <roryf@oddmatics.uk>
+ */
+
+#version 330 core
 
 in vec2  fsUV;
 in vec4  fsSourceRect;

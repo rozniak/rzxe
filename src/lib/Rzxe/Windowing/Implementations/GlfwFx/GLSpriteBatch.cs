@@ -1,51 +1,121 @@
-﻿using Oddmatics.Rzxe.Windowing.Graphics;
+﻿/**
+ * GLSpriteBatch.cs - OpenGL Sprite Batch Implementation
+ *
+ * This source-code is part of rzxe - an experimental game engine by Oddmatics:
+ * <<https://www.oddmatics.uk>>
+ *
+ * Author(s): Rory Fewell <roryf@oddmatics.uk>
+ */
+
+using Oddmatics.Rzxe.Windowing.Graphics;
 using Pencil.Gaming.Graphics;
 using Pencil.Gaming.MathUtils;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
 {
+    /// <summary>
+    /// The OpenGL implementation of the sprite batch interface.
+    /// </summary>
     internal sealed class GLSpriteBatch : ISpriteBatch
     {
+        /// <inheritdoc />
         public ISpriteAtlas Atlas { get; private set; }
-    
-    
+        
+        
+        /// <summary>
+        /// The graphics controller responsible for creating the sprite batch.
+        /// </summary>
         private GLGraphicsController OwnerController { get; set; }
 
         #region GL Stuff
-
+        
+        /// <summary>
+        /// The ID for the OpenGL uniform variable holding the canvas resolution.
+        /// </summary>
         private int GlCanvasResolutionUniformId { get; set; }
-
+        
+        /// <summary>
+        /// The ID for the OpenGL shader program.
+        /// </summary>
         private uint GlProgramId { get; set; }
-
+        
+        /// <summary>
+        /// The ID for the OpenGL uniform variable holding the UV map resolution.
+        /// </summary>
         private int GlUvMapResolutionUniformId { get; set; }
-
+        
+        /// <summary>
+        /// The collection of floating-point values that will populate a VBO with
+        /// target vertex data.
+        /// </summary>
         private List<float> VboDrawContents { get; set; }
         
+        /// <summary>
+        /// The collection of floating-point values that will populate a VBO with draw
+        /// mode data.
+        /// </summary>
         private List<float> VboDrawModes { get; set; }
         
+        /// <summary>
+        /// The collection of floating-point values that will populate a VBO with
+        /// origin vertex data.
+        /// </summary>
+        /// <remarks>
+        /// This is used by the shader program in order to do tiling of sprites when
+        /// drawing to a region larger than the sprite itself. The origin vertex is
+        /// repeated in the VBO so that it can be modulo'd to calculate the UV
+        /// co-ordinate to sample from.
+        /// </remarks>
         private List<float> VboOrigins { get; set; }
-
+        
+        /// <summary>
+        /// The collection of floating-point values that will populate a VBO with UV
+        /// source rectangles.
+        /// </summary>
+        /// <remarks>
+        /// This is also used by the shader program for sampling calculations, alongside
+        /// <see cref="VboOrigins"/>.
+        /// </remarks>
         private List<float> VboSourceRects { get; set; }
-
+        
+        /// <summary>
+        /// The collection of floating-point values that will populate a VBO with UV
+        /// vertex data.
+        /// </summary>
         private List<float> VboUvContents { get; set; }
-
+        
+        /// <summary>
+        /// The number of vertices to draw.
+        /// </summary>
         private int VertexCount { get; set; }
 
         #endregion
 
         #region Resource Stuff
-
+        
+        /// <summary>
+        /// The resource cache for graphics objects.
+        /// </summary>
         private GLResourceCache ResourceCache { get; set; }
 
         #endregion
 
         
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GLSpriteBatch"/> class.
+        /// </summary>
+        /// <param name="owner">
+        /// The graphics controller creating the sprite batch.
+        /// </param>
+        /// <param name="atlas">
+        /// The sprite atlas to use.
+        /// </param>
+        /// <param name="resourceCache">
+        /// The resource cache for graphics objects.
+        /// </param>
         public GLSpriteBatch(
             GLGraphicsController owner,
             GLSpriteAtlas        atlas,
@@ -61,7 +131,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
 
             // Set up GL fields
             //
-            GlProgramId = ResourceCache.GetShaderProgram("SimpleUVs"); // FIXME: Hard-coded ew!
+            GlProgramId =
+                ResourceCache.GetShaderProgram("SimpleUVs"); // FIXME: Hard-coded ew!
 
             GlCanvasResolutionUniformId =
                 GL.GetUniformLocation(
@@ -84,6 +155,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         }
         
         
+        /// <inheritdoc />
         public void Draw(
             ISprite sprite,
             Point   location
@@ -95,6 +167,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             );
         }
         
+        /// <inheritdoc />
         public void Draw(
             System.Drawing.Rectangle sourceRect,
             Point                    location        
@@ -110,7 +183,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                 location
             );
         }
-
+        
+        /// <inheritdoc />
         public void Draw(
             ISprite                  sprite,
             System.Drawing.Rectangle destRect,
@@ -124,6 +198,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             );
         }
         
+        /// <inheritdoc />
         public void Draw(
             System.Drawing.Rectangle sourceRect,
             System.Drawing.Rectangle destRect,
@@ -146,7 +221,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                 drawMode
             );
         }
-
+        
+        /// <inheritdoc />
         public void DrawBorderBox(
             IBorderBoxResource       borderBox,
             System.Drawing.Rectangle destRect
@@ -264,6 +340,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             );
         }
         
+        /// <inheritdoc />
         public void DrawString(
             string text,
             string fontBaseName,
@@ -296,7 +373,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                 x += sprite.Bounds.Width * scale + scale;
             }
         }
-
+        
+        /// <inheritdoc />
         public void Finish()
         {
             // Create VBOs for the batch
@@ -450,8 +528,21 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             GL.DeleteBuffer(vboVsOriginId);
             GL.DeleteBuffer(vboVsDrawModeId);
         }
-        
-        
+
+
+        /// <summary>
+        /// Clones a floating-point value the specified number of times for insertion
+        /// into a VBO.
+        /// </summary>
+        /// <param name="source">
+        /// The value.
+        /// </param>
+        /// <param name="count">
+        /// The number of times to clone the value.
+        /// </param>
+        /// <returns>
+        /// The cloned value as an <see cref="IList{float}"/> collection.
+        /// </returns>
         private IList<float> CloneVbo(
             float source,
             int   count
@@ -466,7 +557,20 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             
             return target;
         }
-
+        
+        /// <summary>
+        /// Clones a collection of floating-point values the specified number of times
+        /// for insertion into a VBO.
+        /// </summary>
+        /// <param name="source">
+        /// The values.
+        /// </param>
+        /// <param name="count">
+        /// The number of times to clone the values.
+        /// </param>
+        /// <returns>
+        /// The cloned value as an <see cref="IList{float}"/> collection.
+        /// </returns>
         private IList<float> CloneVbo(
             IList<float> source,
             int          count
@@ -482,10 +586,18 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             return target;
         }
         
+        /// <summary>
+        /// Draws the region of the atlas at the specified location.
+        /// </summary>
+        /// <param name="sourceRect">
+        /// The source region on the atlas.
+        /// </param>
+        /// <param name="location">
+        /// The location to draw the region.
+        /// </param>
         private void Draw(
             Rectanglei sourceRect,
-            Point      location,
-            DrawMode   drawMode = DrawMode.Stretch
+            Point      location
         )
         {
             Draw(
@@ -500,10 +612,22 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                         sourceRect.Height
                     )
                 ),
-                drawMode
+                DrawMode.Stretch
             );
         }
-
+        
+        /// <summary>
+        /// Draw the specified sourceRect, destRect and drawMode.
+        /// </summary>
+        /// <param name="sourceRect">
+        /// The source region on the atlas.
+        /// </param>
+        /// <param name="destRect">
+        /// The region to draw into.
+        /// </param>
+        /// <param name="drawMode">
+        /// The mode that defines how the sprite should be drawn.
+        /// </param>
         private void Draw(
             Rectanglei sourceRect,
             Rectanglei destRect,
@@ -528,6 +652,16 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             VertexCount += 6;
         }
         
+        /// <summary>
+        /// Creates VBO data for the origin VBO from a given origin point.
+        /// </summary>
+        /// <param name="origin">
+        /// The origin point.
+        /// </param>
+        /// <returns>
+        /// A collection of floating-point values based on the origin point ready for
+        /// insertion into a VBO.
+        /// </returns>
         private IList<float> MakeOriginData(
             Vector2i origin        
         )
@@ -539,7 +673,17 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             
             return data;
         }
-
+        
+        /// <summary>
+        /// Creates VBO data for the source rectangle VBO from a given UV rectangle.
+        /// </summary>
+        /// <param name="rect">
+        /// The source UV rectangle.
+        /// </param>
+        /// <returns>
+        /// A collection of floating-point values based on the source UV rectangle
+        /// ready for insertion into a VBO.
+        /// </returns>
         private IList<float> MakeSourceRectData(
             Rectanglei rect
         )

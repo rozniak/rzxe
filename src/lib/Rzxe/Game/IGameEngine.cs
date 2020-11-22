@@ -1,5 +1,5 @@
 ﻿/**
- * GameState.cs - Game State
+ * IGameEngine.cs - Game Engine Interface
  *
  * This source-code is part of rzxe - an experimental game engine by Oddmatics:
  * <<https://www.oddmatics.uk>>
@@ -14,42 +14,38 @@ using System;
 namespace Oddmatics.Rzxe.Game
 {
     /// <summary>
-    /// Represents a state for the game.
+    /// Represents the game engine.
     /// </summary>
-    public abstract class GameState : IEquatable<GameState>
+    public interface IGameEngine
     {
         /// <summary>
-        /// Gets the focal mode for the state.
+        /// Gets or sets the current game state.
         /// </summary>
-        public abstract InputFocalMode FocalMode { get; }
+        GameState CurrentGameState { get; set; }
         
         /// <summary>
-        /// Gets the nice name of the state.
+        /// Gets the game engine parameters.
         /// </summary>
-        public abstract string Name { get; }
-        
-        
-        /// <inheritdoc />
-        public bool Equals(
-            GameState other
-        )
-        {
-            return Name == other.Name;
-        }
+        IGameEngineParameters Parameters { get; }
         
         
         /// <summary>
-        /// Renders the game state.
+        /// Starts the game engine.
+        /// </summary>
+        void Begin();
+        
+        /// <summary>
+        /// Renders the next frame.
         /// </summary>
         /// <param name="graphics">
         /// The graphics interface for the renderer.
         /// </param>
-        public abstract void RenderFrame(
+        void RenderFrame(
             IGraphicsController graphics
         );
         
         /// <summary>
-        /// Update the specified deltaTime and inputs.
+        /// Updates the game engine with the latest inputs from the window manager.
         /// </summary>
         /// <param name="deltaTime">
         /// The time difference since the last update.
@@ -57,7 +53,7 @@ namespace Oddmatics.Rzxe.Game
         /// <param name="inputs">
         /// The latest state of inputs.
         /// </param>
-        public abstract void Update(
+        void Update(
             TimeSpan deltaTime,
             InputEvents inputs
         );

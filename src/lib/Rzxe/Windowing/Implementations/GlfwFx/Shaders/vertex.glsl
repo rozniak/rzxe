@@ -1,4 +1,13 @@
-﻿#version 330 core
+﻿/**
+ * vertex.glsl - Default Vertex Shader
+ *
+ * This source-code is part of rzxe - an experimental game engine by Oddmatics:
+ * <<https://www.oddmatics.uk>>
+ *
+ * Author(s): Rory Fewell <roryf@oddmatics.uk>
+ */
+
+#version 330 core
 
 layout(location = 0) in vec2  vsVertexPosition;
 layout(location = 1) in vec2  vsVertexUV;

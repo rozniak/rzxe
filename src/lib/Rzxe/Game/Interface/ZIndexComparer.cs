@@ -1,14 +1,26 @@
-﻿using System;
+﻿/**
+ * ZIndexComparer.cs - Z-Index Comparer Class
+ *
+ * This source-code is part of rzxe - an experimental game engine by Oddmatics:
+ * <<https://www.oddmatics.uk>>
+ *
+ * Author(s): Rory Fewell <roryf@oddmatics.uk>
+ */
+
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Oddmatics.Rzxe.Game.Interface
 {
+    /// <summary>
+    /// Provides methods for comparing z-indexes of <see cref="UxComponent"/> objects.
+    /// </summary>
     internal sealed class ZIndexComparer : IComparer<UxComponent>
     {
-        public int Compare(UxComponent x, UxComponent y)
+        /// <inheritdoc />
+        public int Compare(
+            UxComponent x,
+            UxComponent y
+        )
         {
             if (x.ZIndex > y.ZIndex)
             {

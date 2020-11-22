@@ -1,19 +1,30 @@
-﻿using Oddmatics.Rzxe.Game;
+﻿/**
+ * GameEntryPoint.cs - Game Entry Point
+ *
+ * This source-code is part of rzxe - an experimental game engine by Oddmatics:
+ * <<https://www.oddmatics.uk>>
+ *
+ * Author(s): Rory Fewell <roryf@oddmatics.uk>
+ */
+
+using Oddmatics.Rzxe.Game;
 using Oddmatics.Rzxe.Input;
 using Oddmatics.Rzxe.Windowing;
 using Oddmatics.Rzxe.Windowing.Implementations.GlfwFx;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
 
 namespace Oddmatics.Rzxe
 {
+    /// <summary>
+    /// Represents the entry point for the game engine.
+    /// </summary>
     public sealed class GameEntryPoint
     {
-        private IGameEngine _GameEngine;
+        /// <summary>
+        /// Gets or sets the game engine to run.
+        /// </summary>
         public IGameEngine GameEngine
         {
             get { return _GameEngine; }
@@ -23,7 +34,7 @@ namespace Oddmatics.Rzxe
                 {
                     throw new InvalidOperationException(
                         "Game engine state has been locked."
-                        );
+                    );
                 }
                 else
                 {
@@ -31,27 +42,37 @@ namespace Oddmatics.Rzxe
                 }
             }
         }
-
-
+        private IGameEngine _GameEngine;
+        
+        /// <summary>
+        /// Gets a value indicating whether the game engine state has been locked.
+        /// </summary>
         public bool Locked { get; private set; }
-
+        
+        
+        /// <summary>
+        /// The window manager.
+        /// </summary>
         private IWindowManager WindowManager { get; set; }
-
-
+        
+        
+        /// <summary>
+        /// Initializes subsystems to begin running the game.
+        /// </summary>
         public void Initialize()
         {
             if (Locked)
             {
                 throw new InvalidOperationException(
                     "Game engine state has been locked."
-                    );
+                );
             }
 
             if (GameEngine == null)
             {
                 throw new InvalidOperationException(
                     "No game engine provided."
-                    );
+                );
             }
 
             // FIXME: Replace this one day with a way of selecting the window manager
@@ -63,7 +84,10 @@ namespace Oddmatics.Rzxe
             
             WindowManager.Initialize();
         }
-
+        
+        /// <summary>
+        /// Runs the game.
+        /// </summary>
         public void Run()
         {
             if (WindowManager == null || !WindowManager.Ready)

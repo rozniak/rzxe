@@ -1,36 +1,61 @@
-﻿using Oddmatics.Rzxe.Input;
+﻿/**
+ * UxShell.cs - User Interface Shell
+ *
+ * This source-code is part of rzxe - an experimental game engine by Oddmatics:
+ * <<https://www.oddmatics.uk>>
+ *
+ * Author(s): Rory Fewell <roryf@oddmatics.uk>
+ */
+
+using Oddmatics.Rzxe.Input;
 using Oddmatics.Rzxe.Logic;
 using Oddmatics.Rzxe.Util.Collections;
 using Oddmatics.Rzxe.Windowing.Graphics;
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Oddmatics.Rzxe.Game.Interface
 {
+    /// <summary>
+    /// Represents an in-game user interface shell.
+    /// </summary>
     public class UxShell
     {
         // TODO: Rethink how inputs are handled, use built in .NET types?
         //
+        /// <summary>
+        /// The mouse button controls.
+        /// </summary>
         private static readonly string[] MouseButtons = new string[]
         {
             "mb.left",
             "mb.middle",
             "mb.right"
         };
-
-
+        
+        
+        /// <summary>
+        /// Gets or sets the components in the shell.
+        /// </summary>
         public SortedList2<UxComponent> Components { get; set; }
-
-
+        
+        
+        /// <summary>
+        /// The map of mouse buttons to components that they were originally clicked
+        /// on.
+        /// </summary>
         private UxComponent[] ClickStartedComponent { get; set; }
-
+        
+        /// <summary>
+        /// The component that the mouse is currently hovering over.
+        /// </summary>
         private UxComponent HoveredComponent { get; set; }
-
-
+        
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UxShell"/> class.
+        /// </summary>
         public UxShell()
         {
             Components = new SortedList2<UxComponent>(new ZIndexComparer());
@@ -40,9 +65,20 @@ namespace Oddmatics.Rzxe.Game.Interface
             //
             ClickStartedComponent = new UxComponent[3];
         }
-
-
-        public bool HandleMouseInputs(InputEvents inputs)
+        
+        
+        /// <summary>
+        /// Handles a mouse input update for the shell.
+        /// </summary>
+        /// <param name="inputs">
+        /// The new input state.
+        /// </param>
+        /// <returns>
+        /// True if the mouse is hit tested on a component.
+        /// </returns>
+        public bool HandleMouseInputs(
+            InputEvents inputs
+        )
         {
             UxComponent component = MouseHitTest(inputs.MousePosition);
 
@@ -107,8 +143,16 @@ namespace Oddmatics.Rzxe.Game.Interface
 
             return false;
         }
-
-        public void RenderFrame(IGraphicsController graphics)
+        
+        /// <summary>
+        /// Renders the shell.
+        /// </summary>
+        /// <param name="graphics">
+        /// The graphics interface for the renderer.
+        /// </param>
+        public void RenderFrame(
+            IGraphicsController graphics
+        )
         {
             // Render controls back-to-front
             //
@@ -123,9 +167,20 @@ namespace Oddmatics.Rzxe.Game.Interface
             
             sb.Finish();
         }
-
-
-        private UxComponent MouseHitTest(PointF mousePos)
+        
+        
+        /// <summary>
+        /// Performs the hit test for the mouse on components inside the shell.
+        /// </summary>
+        /// <param name="mousePos">
+        /// The position of the mouse.
+        /// </param>
+        /// <returns>
+        /// The top-most component that is hit tested by the mouse, null otherwise.
+        /// </returns>
+        private UxComponent MouseHitTest(
+            PointF mousePos
+        )
         {
             IEnumerable<UxComponent> components = Components.Reverse();
 
