@@ -36,5 +36,20 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
         /// Gets the sprites defined for the atlas.
         /// </summary>
         IReadOnlyDictionary<string, ISprite> Sprites { get; }
+        
+        
+        /// <summary>
+        /// Gets a sprite font from the atlas.
+        /// </summary>
+        /// <param name="name">
+        /// The name of the font.
+        /// </param>
+        /// <returns>
+        /// The sprite font from the atlas, at the requested <paramref name="scale"/>.
+        /// </returns>
+        IFont GetSpriteFont(
+            string name,
+            int    scale = 1
+        );
     }
 }

@@ -13,6 +13,7 @@ using Pencil.Gaming.MathUtils;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
 {
@@ -343,34 +344,28 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         /// <inheritdoc />
         public void DrawString(
             string text,
-            string fontBaseName,
-            Point  location,
-            int    scale = 1
+            IFont  font,
+            Point  location
         )
         {
-            int x = location.X;
-            
-            foreach (char c in text)
+            //
+            // TODO: Update this code to handle IFonts
+            //
+            switch (font.FontKind)
             {
-                string spriteName = $"{fontBaseName}_{c}";
-                var    sprite     = (GLSprite) Atlas.Sprites[spriteName];
-                
-                Draw(
-                    sprite,
-                    new System.Drawing.Rectangle(
-                        new Point(
-                            x,
-                            location.Y - sprite.Bounds.Height * scale
-                        ),
-                        new Size(
-                            sprite.Bounds.Width * scale,
-                            sprite.Bounds.Height * scale
-                        )
-                    ),
-                    DrawMode.Stretch
-                );
-                
-                x += sprite.Bounds.Width * scale + scale;
+                case FontKind.SpriteFont:
+                    DrawStringWithSpriteFont(
+                        text,
+                        (GLSpriteFont) font,
+                        location
+                    );
+                    
+                    break;
+
+                default:
+                    throw new NotSupportedException(
+                        "Unsupported font specified."
+                    );
             }
         }
         
@@ -650,6 +645,88 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             );
 
             VertexCount += 6;
+        }
+
+        /// <summary>
+        /// Draws a string at the specified location using a sprite font.
+        /// </summary>
+        /// <param name="text">
+        /// The text.
+        /// </param>
+        /// <param name="font">
+        /// The sprite font to use.
+        /// </param>
+        /// <param name="location">
+        /// The location to draw the string.
+        /// </param>
+        private void DrawStringWithSpriteFont(
+            string       text,
+            GLSpriteFont font,
+            Point        location
+        )
+        {
+            string[]      lines    = text.Split('\n');
+            StringMetrics metrics  = font.MeasureString(text);
+            char          prevChar = '\0';
+            int           xCurrent = location.X;
+            int           yCurrent = location.Y;
+            int           yOffset  = location.Y;
+            
+            for (int i = 0; i < lines.Length; i++)
+            {
+                string                  line        = lines[i];
+                SingleLineStringMetrics lineMetrics = metrics.LineMetrics.ElementAt(i);
+
+                yCurrent = yOffset + lineMetrics.YBaseline;
+                
+                foreach (char c in line)
+                {
+                    GLSprite sprite;
+                    char     thisChar = font.TryGetCharacterSprite(c, out sprite);
+                    
+                    // Retrieve kerning metrics for the character
+                    //
+                    int[]  kerning = { 0, 0 };
+                    string kernStr = $"{prevChar}{thisChar}";
+                    
+                    if (
+                        prevChar != '\0' &&
+                        font.Kerning.ContainsKey(kernStr)
+                    )
+                    {
+                        kerning = font.Kerning[kernStr];
+                    }
+                    
+                    xCurrent += kerning[0] * font.Scale;
+                    
+                    // Draw at current spot
+                    //
+                    Draw(
+                        sprite,
+                        new System.Drawing.Rectangle(
+                            new Point(
+                                xCurrent,
+                                yCurrent -  kerning[1]
+                            ),
+                            new Size(
+                                sprite.Size.Width  * font.Scale,
+                                sprite.Size.Height * font.Scale
+                            )
+                        ),
+                        DrawMode.Stretch
+                    );
+
+                    // Advance x-offset
+                    //
+                    xCurrent +=
+                        (sprite.Size.Width + font.CharacterSpacing) * font.Scale;
+                }
+
+                // We're done with the line - advance offsets
+                //
+                xCurrent  = 0;
+                yOffset  += lineMetrics.Size.Height + (font.LineSpacing * font.Scale);
+            }
         }
         
         /// <summary>

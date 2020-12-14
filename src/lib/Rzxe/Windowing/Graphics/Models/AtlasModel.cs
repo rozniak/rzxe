@@ -22,6 +22,11 @@ namespace Oddmatics.Rzxe.Windowing.Graphics.Models
         public List<BorderBoxModel> BorderBoxes { get; set; }
         
         /// <summary>
+        /// Gets or sets the collection of sprite font definitions.
+        /// </summary>
+        public List<FontModel> Fonts { get; set; }
+        
+        /// <summary>
         /// Gets or sets the collection of sprite mapping definitions.
         /// </summary>
         public List<SpriteMappingModel> SpriteMappings { get; set; }

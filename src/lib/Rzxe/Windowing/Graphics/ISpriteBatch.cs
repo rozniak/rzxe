@@ -108,20 +108,16 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
         /// <param name="text">
         /// The text.
         /// </param>
-        /// <param name="fontNameBase">
-        /// The base name of the sprite font present in the atlas.
+        /// <param name="font">
+        /// The font to use.
         /// </param>
         /// <param name="location">
         /// The location to draw the string.
         /// </param>
-        /// <param name="scale">
-        /// The scale for the sprite font.
-        /// </param>
         void DrawString(
             string text,
-            string fontNameBase,
-            Point  location,
-            int    scale = 1
+            IFont  font,
+            Point  location
         );
         
         /// <summary>

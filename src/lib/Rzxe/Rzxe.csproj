@@ -78,6 +78,12 @@
     <Compile Include="Windowing\Implementations\GlfwFx\GLSprite.cs" />
     <Compile Include="Windowing\Implementations\GlfwFx\GLBorderBoxResource.cs" />
     <Compile Include="Windowing\Graphics\BorderBoxSegment.cs" />
+    <Compile Include="Windowing\Graphics\IFont.cs" />
+    <Compile Include="Windowing\Graphics\FontKind.cs" />
+    <Compile Include="Windowing\Graphics\Models\FontModel.cs" />
+    <Compile Include="Windowing\Implementations\GlfwFx\GLSpriteFont.cs" />
+    <Compile Include="Windowing\Graphics\StringMetrics.cs" />
+    <Compile Include="Windowing\Graphics\SingleLineStringMetrics.cs" />
   </ItemGroup>
   <ItemGroup>
     <ContentWithTargetPath Include="Windowing\Implementations\GlfwFx\Shaders\fragment.glsl">

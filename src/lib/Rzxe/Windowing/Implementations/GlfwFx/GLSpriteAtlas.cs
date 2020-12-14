@@ -14,9 +14,9 @@ using Pencil.Gaming.Graphics;
 using Pencil.Gaming.MathUtils;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
-using System.Collections.ObjectModel;
 
 namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
 {
@@ -61,6 +61,11 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         /// </summary>
         private bool Disposing { get; set; }
         
+        /// <summary>
+        /// The available font models in the atlas.
+        /// </summary>
+        private IReadOnlyDictionary<string, FontModel> FontModels { get; set; }
+        
         
         /// <summary>
         /// Initializes a new instance of the <see cref="GLSpriteAtlas"/> class.
@@ -86,6 +91,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             // Model setup
             //
             var borderBoxes = new Dictionary<string, IBorderBoxResource>();
+            var fontModels  = new Dictionary<string, FontModel>();
             var sprites     = new Dictionary<string, ISprite>();
             
             foreach (SpriteMappingModel spriteMapping in model.SpriteMappings)
@@ -111,6 +117,19 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                     borderBoxes
                 );
             
+            foreach (FontModel fontModel in model.Fonts)
+            {
+                fontModels.Add(
+                    fontModel.Name,
+                    fontModel
+                );
+            }
+            
+            FontModels =
+                new ReadOnlyDictionary<string, FontModel>(
+                    fontModels
+                );
+
             // GL Setup
             //
             GlAtlasSize = new Vector2(bitmap.Width, bitmap.Height);
@@ -133,7 +152,23 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             GL.DeleteTexture(GlTextureId);
         }
         
-        
+        /// <inheritdoc />
+        public IFont GetSpriteFont(
+            string name,
+            int    scale = 1
+        )
+        {
+            if (!FontModels.ContainsKey(name))
+            {
+                throw new KeyNotFoundException(
+                    "Font not present in atlas."
+                );
+            }
+            
+            return new GLSpriteFont(this, FontModels[name], scale);
+        }
+
+
         /// <summary>
         /// Creates a <see cref="GLSpriteAtlas"/> from the specified file set.
         /// </summary>
