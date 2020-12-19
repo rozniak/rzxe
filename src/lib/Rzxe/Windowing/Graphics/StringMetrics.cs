@@ -21,14 +21,14 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
         /// <summary>
         /// Gets the measured metrics for each line in the string.
         /// </summary>
-        public IEnumerable<SingleLineStringMetrics> LineMetrics { get; }
+        public IEnumerable<SingleLineStringMetrics> LineMetrics { get; private set; }
         
         /// <summary>
         /// Gets the size of the string.
         /// </summary>
-        public Size Size;
-        
-        
+        public Size Size { get; private set; }
+
+
         /// <summary>
         /// Initializes a new instance of the <see cref="StringMetrics"/> class.
         /// </summary>
@@ -61,6 +61,8 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
             }
             
             totalHeight += lineSpacing * (LineMetrics.Count() - 1);
+
+            Size = new Size(largestWidth, totalHeight);
         }
     }
 }

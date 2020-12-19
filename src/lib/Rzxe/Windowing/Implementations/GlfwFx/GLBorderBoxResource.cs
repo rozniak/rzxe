@@ -23,31 +23,13 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         /// <inheritdoc />
         public string Name { get; private set; }
         
+        /// <inheritdoc />
+        public EdgeMetrics Slices { get; private set; }
+
         /// <summary>
         /// Gets the referenced sprite for the border box.
         /// </summary>
         public GLSprite Sprite { get; private set; }
-        
-        
-        /// <summary>
-        /// The offset for the bottom slice of the sprite.
-        /// </summary>
-        private int BottomSlice { get; set; }
-        
-        /// <summary>
-        /// The offset for the left slice of the sprite.
-        /// </summary>
-        private int LeftSlice { get; set; }
-        
-        /// <summary>
-        /// The offset for the right slice of the sprite.
-        /// </summary>
-        private int RightSlice { get; set; }
-        
-        /// <summary>
-        /// The offset for the top slice of the sprite.
-        /// </summary>
-        private int TopSlice { get; set; }
         
         
         /// <summary>
@@ -79,12 +61,13 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             }
 
             Name   = model.Name;
+            Slices = new EdgeMetrics(
+                         model.Slices[0],
+                         model.Slices[1],
+                         model.Slices[2],
+                         model.Slices[3]
+                     );
             Sprite = (GLSprite) atlas.Sprites[model.SpriteName];
-            
-            TopSlice    = model.Slices[0];
-            RightSlice  = model.Slices[1];
-            BottomSlice = model.Slices[2];
-            LeftSlice   = model.Slices[3];
         }
         
         
@@ -106,73 +89,73 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                 case BorderBoxSegment.BottomLeft:
                     return new Rectanglei(
                         Sprite.Bounds.Left,
-                        Sprite.Bounds.Bottom - BottomSlice,
-                        LeftSlice,
-                        BottomSlice
+                        Sprite.Bounds.Bottom - Slices.Bottom,
+                        Slices.Left,
+                        Slices.Bottom
                     );
                     
                 case BorderBoxSegment.BottomMiddle:
                     return new Rectanglei(
-                        Sprite.Bounds.Left + LeftSlice,
-                        Sprite.Bounds.Bottom - BottomSlice,
-                        Sprite.Bounds.Width - LeftSlice - RightSlice,
-                        BottomSlice
+                        Sprite.Bounds.Left + Slices.Left,
+                        Sprite.Bounds.Bottom - Slices.Bottom,
+                        Sprite.Bounds.Width - Slices.Left - Slices.Right,
+                        Slices.Bottom
                     );
                     
                 case BorderBoxSegment.BottomRight:
                     return new Rectanglei(
-                        Sprite.Bounds.Right - RightSlice,
-                        Sprite.Bounds.Bottom - BottomSlice,
-                        RightSlice,
-                        BottomSlice
+                        Sprite.Bounds.Right - Slices.Right,
+                        Sprite.Bounds.Bottom - Slices.Bottom,
+                        Slices.Right,
+                        Slices.Bottom
                     );
                     
                 case BorderBoxSegment.MiddleLeft:
                     return new Rectanglei(
                         Sprite.Bounds.Left,
-                        Sprite.Bounds.Top + TopSlice,
-                        LeftSlice,
-                        Sprite.Bounds.Height - TopSlice - BottomSlice
+                        Sprite.Bounds.Top + Slices.Top,
+                        Slices.Left,
+                        Sprite.Bounds.Height - Slices.Top - Slices.Bottom
                     );
                     
                 case BorderBoxSegment.MiddleMiddle:
                     return new Rectanglei(
-                        Sprite.Bounds.Left + LeftSlice,
-                        Sprite.Bounds.Top + TopSlice,
-                        Sprite.Bounds.Width - LeftSlice - RightSlice,
-                        Sprite.Bounds.Height - TopSlice - BottomSlice
+                        Sprite.Bounds.Left + Slices.Left,
+                        Sprite.Bounds.Top + Slices.Top,
+                        Sprite.Bounds.Width - Slices.Left - Slices.Right,
+                        Sprite.Bounds.Height - Slices.Top - Slices.Bottom
                     );
                     
                 case BorderBoxSegment.MiddleRight:
                     return new Rectanglei(
-                        Sprite.Bounds.Right - RightSlice,
-                        Sprite.Bounds.Top + TopSlice,
-                        RightSlice,
-                        Sprite.Bounds.Height - TopSlice - BottomSlice
+                        Sprite.Bounds.Right - Slices.Right,
+                        Sprite.Bounds.Top + Slices.Top,
+                        Slices.Right,
+                        Sprite.Bounds.Height - Slices.Top - Slices.Bottom
                     );
                     
                 case BorderBoxSegment.TopLeft:
                     return new Rectanglei(
                         Sprite.Bounds.Left,
                         Sprite.Bounds.Top,
-                        LeftSlice,
-                        TopSlice
+                        Slices.Left,
+                        Slices.Top
                     );
                     
                 case BorderBoxSegment.TopMiddle:
                     return new Rectanglei(
-                        Sprite.Bounds.Left + LeftSlice,
+                        Sprite.Bounds.Left + Slices.Left,
                         Sprite.Bounds.Top,
-                        Sprite.Bounds.Width - LeftSlice - RightSlice,
-                        TopSlice
+                        Sprite.Bounds.Width - Slices.Left - Slices.Right,
+                        Slices.Top
                     );
                     
                 case BorderBoxSegment.TopRight:
                     return new Rectanglei(
-                        Sprite.Bounds.Right - RightSlice,
+                        Sprite.Bounds.Right - Slices.Right,
                         Sprite.Bounds.Top,
-                        RightSlice,
-                        TopSlice
+                        Slices.Right,
+                        Slices.Top
                     );
                     
                 default:

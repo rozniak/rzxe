@@ -1,5 +1,5 @@
 ﻿/**
- * ISpriteBatch.cs - Sprite Batch Interface
+ * ISubSpriteBatch.cs - Sprite Batch (Portion) Interface
  *
  * This source-code is part of rzxe - an experimental game engine by Oddmatics:
  * <<https://www.oddmatics.uk>>
@@ -7,28 +7,22 @@
  * Author(s): Rory Fewell <roryf@oddmatics.uk>
  */
 
+using System;
 using System.Drawing;
 
 namespace Oddmatics.Rzxe.Windowing.Graphics
 {
     /// <summary>
-    /// Represents a sprite batch for drawing sprites en-masse.
+    /// Represents a portion of a larger sprite batch for providing draw instructions
+    /// that can be executed en-masse.
     /// </summary>
-    public interface ISpriteBatch
+    public interface ISubSpriteBatch
     {
         /// <summary>
         /// Gets the atlas in use.
         /// </summary>
         ISpriteAtlas Atlas { get; }
         
-        
-        /// <summary>
-        /// Creates a sub-batch that can be drawn into an executed later.
-        /// </summary>
-        /// <returns>
-        /// The newly created sub-batch instance.
-        /// </returns>
-        ISubSpriteBatch CreateSubBatch();
         
         /// <summary>
         /// Draws a sprite at the specified location.
@@ -127,20 +121,5 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
             IFont  font,
             Point  location
         );
-        
-        /// <summary>
-        /// Draws a sub-batch.
-        /// </summary>
-        /// <param name="subBatch">
-        /// The sub-batch.
-        /// </param>
-        void DrawSubBatch(
-            ISubSpriteBatch subBatch
-        );
-        
-        /// <summary>
-        /// Commits the sprite batch.
-        /// </summary>
-        void Finish();
     }
 }

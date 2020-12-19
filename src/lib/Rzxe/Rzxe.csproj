@@ -84,6 +84,9 @@
     <Compile Include="Windowing\Implementations\GlfwFx\GLSpriteFont.cs" />
     <Compile Include="Windowing\Graphics\StringMetrics.cs" />
     <Compile Include="Windowing\Graphics\SingleLineStringMetrics.cs" />
+    <Compile Include="Windowing\Graphics\ISubSpriteBatch.cs" />
+    <Compile Include="Windowing\Implementations\GlfwFx\GLSubSpriteBatch.cs" />
+    <Compile Include="Windowing\Graphics\EdgeMetrics.cs" />
   </ItemGroup>
   <ItemGroup>
     <ContentWithTargetPath Include="Windowing\Implementations\GlfwFx\Shaders\fragment.glsl">

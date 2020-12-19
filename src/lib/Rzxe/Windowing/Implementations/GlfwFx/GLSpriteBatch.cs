@@ -30,9 +30,21 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         /// The graphics controller responsible for creating the sprite batch.
         /// </summary>
         private GLGraphicsController OwnerController { get; set; }
-
-        #region GL Stuff
         
+        /// <summary>
+        /// The main sub-batch that will be composed during the draw process.
+        /// </summary>
+        /// <remarks>
+        /// This class makes use of "sub-batch" of its own that pretty much acts as the
+        /// 'master' batch. Put simply - direct draw calls on this class will forward
+        /// to this batch, any merge calls will merge into this batch.
+        ///
+        /// The end result is that this batch will 'compose' of everything done during
+        /// the entire sprite batch as a whole. When Finish() is called, this composed
+        /// batch will be analysed and a VBO created out of it.
+        /// </remarks>
+        private GLSubSpriteBatch ComposerSubBatch { get; set; }
+
         /// <summary>
         /// The ID for the OpenGL uniform variable holding the canvas resolution.
         /// </summary>
@@ -47,62 +59,11 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         /// The ID for the OpenGL uniform variable holding the UV map resolution.
         /// </summary>
         private int GlUvMapResolutionUniformId { get; set; }
-        
-        /// <summary>
-        /// The collection of floating-point values that will populate a VBO with
-        /// target vertex data.
-        /// </summary>
-        private List<float> VboDrawContents { get; set; }
-        
-        /// <summary>
-        /// The collection of floating-point values that will populate a VBO with draw
-        /// mode data.
-        /// </summary>
-        private List<float> VboDrawModes { get; set; }
-        
-        /// <summary>
-        /// The collection of floating-point values that will populate a VBO with
-        /// origin vertex data.
-        /// </summary>
-        /// <remarks>
-        /// This is used by the shader program in order to do tiling of sprites when
-        /// drawing to a region larger than the sprite itself. The origin vertex is
-        /// repeated in the VBO so that it can be modulo'd to calculate the UV
-        /// co-ordinate to sample from.
-        /// </remarks>
-        private List<float> VboOrigins { get; set; }
-        
-        /// <summary>
-        /// The collection of floating-point values that will populate a VBO with UV
-        /// source rectangles.
-        /// </summary>
-        /// <remarks>
-        /// This is also used by the shader program for sampling calculations, alongside
-        /// <see cref="VboOrigins"/>.
-        /// </remarks>
-        private List<float> VboSourceRects { get; set; }
-        
-        /// <summary>
-        /// The collection of floating-point values that will populate a VBO with UV
-        /// vertex data.
-        /// </summary>
-        private List<float> VboUvContents { get; set; }
-        
-        /// <summary>
-        /// The number of vertices to draw.
-        /// </summary>
-        private int VertexCount { get; set; }
 
-        #endregion
-
-        #region Resource Stuff
-        
         /// <summary>
         /// The resource cache for graphics objects.
         /// </summary>
         private GLResourceCache ResourceCache { get; set; }
-
-        #endregion
 
         
         /// <summary>
@@ -123,7 +84,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             GLResourceCache      resourceCache
         )
         {
-            OwnerController = owner;
+            ComposerSubBatch = (GLSubSpriteBatch) CreateSubBatch();
+            OwnerController  = owner;
 
             // Set up resource bits
             //
@@ -146,26 +108,22 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                     GlProgramId,
                     "gUvMapResolution"
                 );
-
-            VertexCount     = 0;
-            VboDrawContents = new List<float>();
-            VboDrawModes    = new List<float>();
-            VboOrigins      = new List<float>();
-            VboSourceRects  = new List<float>();
-            VboUvContents   = new List<float>();
         }
         
         
+        /// <inheritdoc />
+        public ISubSpriteBatch CreateSubBatch()
+        {
+            return new GLSubSpriteBatch((GLSpriteAtlas) Atlas);
+        }
+
         /// <inheritdoc />
         public void Draw(
             ISprite sprite,
             Point   location
         )
         {
-            Draw(
-                ((GLSprite) sprite).Bounds,
-                location
-            );
+            ComposerSubBatch.Draw(sprite, location);
         }
         
         /// <inheritdoc />
@@ -174,15 +132,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             Point                    location        
         )
         {
-            Draw(
-                new Rectanglei(
-                    sourceRect.X,
-                    sourceRect.Y,
-                    sourceRect.Width,
-                    sourceRect.Height
-                ),
-                location
-            );
+            ComposerSubBatch.Draw(sourceRect, location);
         }
         
         /// <inheritdoc />
@@ -192,11 +142,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             DrawMode                 drawMode
         )
         {
-            Draw(
-                ((GLSprite) sprite).Bounds,
-                destRect,
-                drawMode
-            );
+            ComposerSubBatch.Draw(sprite, destRect, drawMode);
         }
         
         /// <inheritdoc />
@@ -206,21 +152,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             DrawMode                 drawMode
         )
         {
-            Draw(
-                new Rectanglei(
-                    sourceRect.X,
-                    sourceRect.Y,
-                    sourceRect.Width,
-                    sourceRect.Height
-                ),
-                new Rectanglei(
-                    destRect.X,
-                    destRect.Y,
-                    destRect.Width,
-                    destRect.Height
-                ),
-                drawMode
-            );
+            ComposerSubBatch.Draw(sourceRect, destRect, drawMode);
         }
         
         /// <inheritdoc />
@@ -229,116 +161,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             System.Drawing.Rectangle destRect
         )
         {
-            //
-            // Build the border-box rect, it will be made up of 9 segments:
-            //
-            // tl - tm - tr
-            // |    |    |
-            // ml - mm - mr
-            // |    |    |
-            // bl - bm - br
-            //
-            var glBorderBox = (GLBorderBoxResource) borderBox;
-            
-            Rectanglei tl = glBorderBox.GetRect(BorderBoxSegment.TopLeft);
-            Rectanglei tm = glBorderBox.GetRect(BorderBoxSegment.TopMiddle);
-            Rectanglei tr = glBorderBox.GetRect(BorderBoxSegment.TopRight);
-            Rectanglei ml = glBorderBox.GetRect(BorderBoxSegment.MiddleLeft);
-            Rectanglei mm = glBorderBox.GetRect(BorderBoxSegment.MiddleMiddle);
-            Rectanglei mr = glBorderBox.GetRect(BorderBoxSegment.MiddleRight);
-            Rectanglei bl = glBorderBox.GetRect(BorderBoxSegment.BottomLeft);
-            Rectanglei bm = glBorderBox.GetRect(BorderBoxSegment.BottomMiddle);
-            Rectanglei br = glBorderBox.GetRect(BorderBoxSegment.BottomRight);
-            
-            // Top section
-            //
-            Draw(
-                tl,
-                destRect.Location
-            );
-            
-            Draw(
-                tm,
-                new Rectanglei(
-                    destRect.X + tl.Width,
-                    destRect.Y,
-                    destRect.Width - tl.Width - tr.Width,
-                    tm.Height
-                ),
-                DrawMode.Tiled
-            );
-            
-            Draw(
-                tr,
-                new Point(
-                    destRect.Right - tr.Width,
-                    destRect.Y
-                )
-            );
-            
-            // Middle section
-            //
-            Draw(
-                ml,
-                new Rectanglei(
-                    destRect.X,
-                    destRect.Y + tl.Height,
-                    ml.Width,
-                    destRect.Height - tl.Height - bl.Height
-                ),
-                DrawMode.Tiled
-            );
-            
-            Draw(
-                mm,
-                new Rectanglei(
-                    destRect.X + tl.Width,
-                    destRect.Y + tl.Height,
-                    destRect.Width - ml.Width - mr.Width,
-                    destRect.Height - tm.Height - bm.Height
-                ),
-                DrawMode.Tiled
-            );
-            
-            Draw(
-                mr,
-                new Rectanglei(
-                    destRect.X + destRect.Width - mr.Width,
-                    destRect.Y + tr.Height,
-                    mr.Width,
-                    destRect.Height - tr.Height - br.Height
-                ),
-                DrawMode.Tiled
-            );
-            
-            // Bottom section
-            //
-            Draw(
-                bl,
-                new Point(
-                    destRect.X,
-                    destRect.Bottom - bl.Height
-                )
-            );
-            
-            Draw(
-                bm,
-                new Rectanglei(
-                    destRect.X + bl.Width,
-                    destRect.Bottom - bm.Height,
-                    destRect.Width - bl.Width - br.Width,
-                    bm.Height
-                ),
-                DrawMode.Tiled
-            );
-            
-            Draw(
-                br,
-                new Point(
-                    destRect.Right - br.Width,
-                    destRect.Bottom - br.Height
-                )
-            );
+            ComposerSubBatch.DrawBorderBox(borderBox, destRect);
         }
         
         /// <inheritdoc />
@@ -348,27 +171,17 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             Point  location
         )
         {
-            //
-            // TODO: Update this code to handle IFonts
-            //
-            switch (font.FontKind)
-            {
-                case FontKind.SpriteFont:
-                    DrawStringWithSpriteFont(
-                        text,
-                        (GLSpriteFont) font,
-                        location
-                    );
-                    
-                    break;
-
-                default:
-                    throw new NotSupportedException(
-                        "Unsupported font specified."
-                    );
-            }
+            ComposerSubBatch.DrawString(text, font, location);
         }
         
+        /// <inheritdoc />
+        public void DrawSubBatch(
+            ISubSpriteBatch subBatch
+        )
+        {
+            ComposerSubBatch.Merge((GLSubSpriteBatch) subBatch);
+        }
+
         /// <inheritdoc />
         public void Finish()
         {
@@ -380,11 +193,11 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             int vboVsOriginId         = GL.GenBuffer();
             int vboVsDrawModeId       = GL.GenBuffer();
 
-            float[] vsVertexPositionData = VboDrawContents.ToArray();
-            float[] vsVertexUVData       = VboUvContents.ToArray();
-            float[] vsSourceRectData     = VboSourceRects.ToArray();
-            float[] vsOriginData         = VboOrigins.ToArray();
-            float[] vsDrawModeData       = VboDrawModes.ToArray();
+            float[] vsVertexPositionData = ComposerSubBatch.VboDrawContents.ToArray();
+            float[] vsVertexUVData       = ComposerSubBatch.VboUvContents.ToArray();
+            float[] vsSourceRectData     = ComposerSubBatch.VboSourceRects.ToArray();
+            float[] vsOriginData         = ComposerSubBatch.VboOrigins.ToArray();
+            float[] vsDrawModeData       = ComposerSubBatch.VboDrawModes.ToArray();
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, vboVsVertexPositionId);
             GL.BufferData(
@@ -507,7 +320,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
 
             // Draw now!
             //
-            GL.DrawArrays(BeginMode.Triangles, 0, VertexCount);
+            GL.DrawArrays(BeginMode.Triangles, 0, ComposerSubBatch.VertexCount);
 
             // Detach and destroy VBOs
             //
@@ -522,257 +335,6 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             GL.DeleteBuffer(vboVsSourceRectId);
             GL.DeleteBuffer(vboVsOriginId);
             GL.DeleteBuffer(vboVsDrawModeId);
-        }
-
-
-        /// <summary>
-        /// Clones a floating-point value the specified number of times for insertion
-        /// into a VBO.
-        /// </summary>
-        /// <param name="source">
-        /// The value.
-        /// </param>
-        /// <param name="count">
-        /// The number of times to clone the value.
-        /// </param>
-        /// <returns>
-        /// The cloned value as an <see cref="IList{float}"/> collection.
-        /// </returns>
-        private IList<float> CloneVbo(
-            float source,
-            int   count
-        )
-        {
-            var target = new List<float>();
-            
-            for (int i = 0; i < count; i++)
-            {
-                target.Add(source);
-            }
-            
-            return target;
-        }
-        
-        /// <summary>
-        /// Clones a collection of floating-point values the specified number of times
-        /// for insertion into a VBO.
-        /// </summary>
-        /// <param name="source">
-        /// The values.
-        /// </param>
-        /// <param name="count">
-        /// The number of times to clone the values.
-        /// </param>
-        /// <returns>
-        /// The cloned value as an <see cref="IList{float}"/> collection.
-        /// </returns>
-        private IList<float> CloneVbo(
-            IList<float> source,
-            int          count
-        )
-        {
-            var target = new List<float>();
-            
-            for (int i = 0; i < count; i++)
-            {
-                target.AddRange(source);
-            }
-            
-            return target;
-        }
-        
-        /// <summary>
-        /// Draws the region of the atlas at the specified location.
-        /// </summary>
-        /// <param name="sourceRect">
-        /// The source region on the atlas.
-        /// </param>
-        /// <param name="location">
-        /// The location to draw the region.
-        /// </param>
-        private void Draw(
-            Rectanglei sourceRect,
-            Point      location
-        )
-        {
-            Draw(
-                sourceRect,
-                new Rectanglei(
-                    new Vector2i(
-                        location.X,
-                        location.Y
-                    ),
-                    new Vector2i(
-                        sourceRect.Width,
-                        sourceRect.Height
-                    )
-                ),
-                DrawMode.Stretch
-            );
-        }
-        
-        /// <summary>
-        /// Draw the specified sourceRect, destRect and drawMode.
-        /// </summary>
-        /// <param name="sourceRect">
-        /// The source region on the atlas.
-        /// </param>
-        /// <param name="destRect">
-        /// The region to draw into.
-        /// </param>
-        /// <param name="drawMode">
-        /// The mode that defines how the sprite should be drawn.
-        /// </param>
-        private void Draw(
-            Rectanglei sourceRect,
-            Rectanglei destRect,
-            DrawMode   drawMode
-        )
-        {
-            VboDrawContents.AddRange(GLUtility.MakeVboData(destRect));
-            VboUvContents.AddRange(GLUtility.MakeVboData(sourceRect));
-            
-            VboSourceRects.AddRange(
-                CloneVbo(MakeSourceRectData(sourceRect), 6)
-            );
-            
-            VboOrigins.AddRange(
-                CloneVbo(MakeOriginData(destRect.Position), 6)
-            );
-            
-            VboDrawModes.AddRange(
-                CloneVbo((float) drawMode, 6)
-            );
-
-            VertexCount += 6;
-        }
-
-        /// <summary>
-        /// Draws a string at the specified location using a sprite font.
-        /// </summary>
-        /// <param name="text">
-        /// The text.
-        /// </param>
-        /// <param name="font">
-        /// The sprite font to use.
-        /// </param>
-        /// <param name="location">
-        /// The location to draw the string.
-        /// </param>
-        private void DrawStringWithSpriteFont(
-            string       text,
-            GLSpriteFont font,
-            Point        location
-        )
-        {
-            string[]      lines    = text.Split('\n');
-            StringMetrics metrics  = font.MeasureString(text);
-            char          prevChar = '\0';
-            int           xCurrent = location.X;
-            int           yCurrent = location.Y;
-            int           yOffset  = location.Y;
-            
-            for (int i = 0; i < lines.Length; i++)
-            {
-                string                  line        = lines[i];
-                SingleLineStringMetrics lineMetrics = metrics.LineMetrics.ElementAt(i);
-
-                yCurrent = yOffset + lineMetrics.YBaseline;
-                
-                foreach (char c in line)
-                {
-                    GLSprite sprite;
-                    char     thisChar = font.TryGetCharacterSprite(c, out sprite);
-                    
-                    // Retrieve kerning metrics for the character
-                    //
-                    int[]  kerning = { 0, 0 };
-                    string kernStr = $"{prevChar}{thisChar}";
-                    
-                    if (
-                        prevChar != '\0' &&
-                        font.Kerning.ContainsKey(kernStr)
-                    )
-                    {
-                        kerning = font.Kerning[kernStr];
-                    }
-                    
-                    xCurrent += kerning[0] * font.Scale;
-                    
-                    // Draw at current spot
-                    //
-                    Draw(
-                        sprite,
-                        new System.Drawing.Rectangle(
-                            new Point(
-                                xCurrent,
-                                yCurrent -  kerning[1]
-                            ),
-                            new Size(
-                                sprite.Size.Width  * font.Scale,
-                                sprite.Size.Height * font.Scale
-                            )
-                        ),
-                        DrawMode.Stretch
-                    );
-
-                    // Advance x-offset
-                    //
-                    xCurrent +=
-                        (sprite.Size.Width + font.CharacterSpacing) * font.Scale;
-                }
-
-                // We're done with the line - advance offsets
-                //
-                xCurrent  = 0;
-                yOffset  += lineMetrics.Size.Height + (font.LineSpacing * font.Scale);
-            }
-        }
-        
-        /// <summary>
-        /// Creates VBO data for the origin VBO from a given origin point.
-        /// </summary>
-        /// <param name="origin">
-        /// The origin point.
-        /// </param>
-        /// <returns>
-        /// A collection of floating-point values based on the origin point ready for
-        /// insertion into a VBO.
-        /// </returns>
-        private IList<float> MakeOriginData(
-            Vector2i origin        
-        )
-        {
-            var data = new List<float>();
-            
-            data.Add(origin.X);
-            data.Add(origin.Y);
-            
-            return data;
-        }
-        
-        /// <summary>
-        /// Creates VBO data for the source rectangle VBO from a given UV rectangle.
-        /// </summary>
-        /// <param name="rect">
-        /// The source UV rectangle.
-        /// </param>
-        /// <returns>
-        /// A collection of floating-point values based on the source UV rectangle
-        /// ready for insertion into a VBO.
-        /// </returns>
-        private IList<float> MakeSourceRectData(
-            Rectanglei rect
-        )
-        {
-            var data = new List<float>();
-            
-            data.Add(rect.Left);
-            data.Add(rect.Top);
-            data.Add(rect.Width);
-            data.Add(rect.Height);
-            
-            return data;
         }
     }
 }

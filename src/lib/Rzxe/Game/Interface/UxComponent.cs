@@ -18,34 +18,40 @@ namespace Oddmatics.Rzxe.Game.Interface
     public abstract class UxComponent
     {
         /// <summary>
-        /// Gets or sets the bounds of the component.
+        /// Gets the bounds of the component.
         /// </summary>
-        public Rectangle Bounds { get; set; }
-        
+        public Rectangle Bounds
+        {
+            get
+            {
+                return new Rectangle(Location, Size);
+            }
+        }
+
         /// <summary>
         /// Gets or sets a value indicating whether the component is enabled.
         /// </summary>
-        public bool Enabled { get; set; }
+        public virtual bool Enabled { get; set; }
         
         /// <summary>
         /// Gets or sets the location of the component.
         /// </summary>
-        public Point Location { get; set; }
+        public virtual Point Location { get; set; }
         
         /// <summary>
         /// Gets or sets the name of the component.
         /// </summary>
-        public string Name { get; set; }
+        public virtual string Name { get; set; }
         
         /// <summary>
         /// Gets a value indicating whether the component is selectable.
         /// </summary>
-        public bool Selectable { get; }
+        public virtual bool Selectable { get; }
         
         /// <summary>
         /// Gets or sets the size of the component.
         /// </summary>
-        public Size Size { get; set; }
+        public virtual Size Size { get; set; }
         
         /// <summary>
         /// Gets or sets the z-index of the component.

@@ -18,5 +18,11 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
         /// Gets the name of the border box resource.
         /// </summary>
         string Name { get; }
+        
+        /// <summary>
+        /// Gets the metrics for slices that divide up the border box's border and
+        /// content area.
+        /// </summary>
+        EdgeMetrics Slices { get; }
     }
 }

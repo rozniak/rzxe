@@ -251,6 +251,10 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
 
                 prevChar = thisChar;
             }
+
+            // The above loop will have an extra space - we subtract that now
+            //
+            maxWidth -= CharacterSpacing;
             
             return new SingleLineStringMetrics(
                 new Point(0, currentYOrigin),
