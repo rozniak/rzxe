@@ -425,7 +425,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         }
         
         /// <summary>
-        /// Draw the specified sourceRect, destRect and drawMode.
+        /// Draws the region of the atlas into a rectangular region using the
+        /// specified draw mode.
         /// </summary>
         /// <param name="sourceRect">
         /// The source region on the atlas.
