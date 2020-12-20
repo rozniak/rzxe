@@ -36,6 +36,19 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
         
         
         /// <summary>
+        /// Measures a single line of text.
+        /// </summary>
+        /// <param name="text">
+        /// The line of text to measure.
+        /// </param>
+        /// <returns>
+        /// The metrics calculated for the specified line of text in the font.
+        /// </returns>
+        SingleLineStringMetrics MeasureSingleLine(
+            string text
+        );
+
+        /// <summary>
         /// Measures a string.
         /// </summary>
         /// <param name="text">

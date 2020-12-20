@@ -12,7 +12,6 @@ using Pencil.Gaming.MathUtils;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 
 namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
 {
@@ -480,15 +479,13 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         )
         {
             string[]      lines    = text.Split('\n');
-            StringMetrics metrics  = font.MeasureString(text);
             char          prevChar = '\0';
             int           xCurrent = location.X;
             int           yOffset  = location.Y;
             
-            for (int i = 0; i < lines.Length; i++)
+            foreach (string line in lines)
             {
-                string                  line        = lines[i];
-                SingleLineStringMetrics lineMetrics = metrics.LineMetrics.ElementAt(i);
+                SingleLineStringMetrics lineMetrics = font.MeasureSingleLine(line);
                 int                     yBased      = yOffset + lineMetrics.YBaseline;
 
                 foreach (char c in line)

@@ -113,8 +113,16 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             
             CharacterSprites = new ReadOnlyDictionary<char, GLSprite>(charDict);
         }
-
         
+        
+        /// <inheritdoc />
+        public SingleLineStringMetrics MeasureSingleLine(
+            string text
+        )
+        {
+            return MeasureLineOfString(text, 0);
+        }
+
         /// <inheritdoc />
         public StringMetrics MeasureString(
             string text
