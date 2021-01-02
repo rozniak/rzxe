@@ -87,6 +87,12 @@
     <Compile Include="Windowing\Graphics\ISubSpriteBatch.cs" />
     <Compile Include="Windowing\Implementations\GlfwFx\GLSubSpriteBatch.cs" />
     <Compile Include="Windowing\Graphics\EdgeMetrics.cs" />
+    <Compile Include="Game\Actors\Animation\ActorAnimationFrame.cs" />
+    <Compile Include="Game\Actors\Animation\AnimationStore.cs" />
+    <Compile Include="Game\Actors\Animation\ActorAnimation.cs" />
+    <Compile Include="Game\Actors\Animation\AnimationServer.cs" />
+    <Compile Include="Game\Actors\Animation\Models\AnimationModel.cs" />
+    <Compile Include="Extensions\TimeSpanExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ContentWithTargetPath Include="Windowing\Implementations\GlfwFx\Shaders\fragment.glsl">
@@ -109,6 +115,10 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Windowing\Graphics\Models\" />
+    <Folder Include="Game\Actors\" />
+    <Folder Include="Game\Actors\Animation\" />
+    <Folder Include="Game\Actors\Animation\Models\" />
+    <Folder Include="Extensions\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

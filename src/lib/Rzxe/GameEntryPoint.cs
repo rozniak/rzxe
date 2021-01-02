@@ -106,6 +106,7 @@ namespace Oddmatics.Rzxe
             {
                 TimeSpan deltaTime = gameTime.Elapsed;
                 gameTime.Reset();
+                gameTime.Start();
 
                 InputEvents inputs = WindowManager.ReadInputEvents();
                 GameEngine.Update(deltaTime, inputs);
