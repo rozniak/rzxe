@@ -33,8 +33,25 @@ namespace Oddmatics.Rzxe.Game.Actors.Animation
         /// </summary>
         public event EventHandler SpecialFrameEntered
         {
-            add { ActiveAnimation.SpecialFrameEntered += value; }
-            remove { ActiveAnimation.SpecialFrameEntered += value; }
+            add
+            {
+                if (ActiveAnimation == null)
+                {
+                    return;
+                }
+
+                ActiveAnimation.SpecialFrameEntered += value;
+            }
+
+            remove
+            {
+                if (ActiveAnimation == null)
+                {
+                    return;
+                }
+
+                ActiveAnimation.SpecialFrameEntered -= value;
+            }
         }
 
 
