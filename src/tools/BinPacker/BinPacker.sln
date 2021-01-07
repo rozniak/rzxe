@@ -1,25 +1,57 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2010
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BinPacker", "BinPacker\BinPacker.csproj", "{8600D7A4-73C9-46DD-ABE0-57FFE74D7092}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BinPacker", "BinPacker\BinPacker.csproj", "{62EE4E6D-230B-49D5-8F8A-6266CE3CAF12}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rzxe", "..\..\lib\Rzxe\Rzxe.csproj", "{827DBEC3-A270-4273-B69D-194A466BD35B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pencil.Gaming", "..\..\..\submodules\Pencil.Gaming\Pencil.Gaming\Pencil.Gaming.csproj", "{DDB6DB6D-E5DE-4BDB-8AC8-26DF800E9FF0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+		Compatibility-GLFW2|Any CPU = Compatibility-GLFW2|Any CPU
+		Core-GLFW2|Any CPU = Core-GLFW2|Any CPU
+		Compatibility-GLFW3|Any CPU = Compatibility-GLFW3|Any CPU
+		Core-GLFW3|Any CPU = Core-GLFW3|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8600D7A4-73C9-46DD-ABE0-57FFE74D7092}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8600D7A4-73C9-46DD-ABE0-57FFE74D7092}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8600D7A4-73C9-46DD-ABE0-57FFE74D7092}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8600D7A4-73C9-46DD-ABE0-57FFE74D7092}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {C9498A61-60AB-444D-9A99-E50217985157}
+		{62EE4E6D-230B-49D5-8F8A-6266CE3CAF12}.Debug|x86.ActiveCfg = Debug|x86
+		{62EE4E6D-230B-49D5-8F8A-6266CE3CAF12}.Debug|x86.Build.0 = Debug|x86
+		{62EE4E6D-230B-49D5-8F8A-6266CE3CAF12}.Release|x86.ActiveCfg = Release|x86
+		{62EE4E6D-230B-49D5-8F8A-6266CE3CAF12}.Release|x86.Build.0 = Release|x86
+		{62EE4E6D-230B-49D5-8F8A-6266CE3CAF12}.Compatibility-GLFW2|Any CPU.ActiveCfg = Debug|x86
+		{62EE4E6D-230B-49D5-8F8A-6266CE3CAF12}.Compatibility-GLFW2|Any CPU.Build.0 = Debug|x86
+		{62EE4E6D-230B-49D5-8F8A-6266CE3CAF12}.Core-GLFW2|Any CPU.ActiveCfg = Debug|x86
+		{62EE4E6D-230B-49D5-8F8A-6266CE3CAF12}.Core-GLFW2|Any CPU.Build.0 = Debug|x86
+		{62EE4E6D-230B-49D5-8F8A-6266CE3CAF12}.Compatibility-GLFW3|Any CPU.ActiveCfg = Debug|x86
+		{62EE4E6D-230B-49D5-8F8A-6266CE3CAF12}.Compatibility-GLFW3|Any CPU.Build.0 = Debug|x86
+		{62EE4E6D-230B-49D5-8F8A-6266CE3CAF12}.Core-GLFW3|Any CPU.ActiveCfg = Debug|x86
+		{62EE4E6D-230B-49D5-8F8A-6266CE3CAF12}.Core-GLFW3|Any CPU.Build.0 = Debug|x86
+		{827DBEC3-A270-4273-B69D-194A466BD35B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{827DBEC3-A270-4273-B69D-194A466BD35B}.Debug|x86.Build.0 = Debug|Any CPU
+		{827DBEC3-A270-4273-B69D-194A466BD35B}.Release|x86.ActiveCfg = Release|Any CPU
+		{827DBEC3-A270-4273-B69D-194A466BD35B}.Release|x86.Build.0 = Release|Any CPU
+		{827DBEC3-A270-4273-B69D-194A466BD35B}.Compatibility-GLFW2|Any CPU.ActiveCfg = Debug|Any CPU
+		{827DBEC3-A270-4273-B69D-194A466BD35B}.Compatibility-GLFW2|Any CPU.Build.0 = Debug|Any CPU
+		{827DBEC3-A270-4273-B69D-194A466BD35B}.Core-GLFW2|Any CPU.ActiveCfg = Debug|Any CPU
+		{827DBEC3-A270-4273-B69D-194A466BD35B}.Core-GLFW2|Any CPU.Build.0 = Debug|Any CPU
+		{827DBEC3-A270-4273-B69D-194A466BD35B}.Compatibility-GLFW3|Any CPU.ActiveCfg = Debug|Any CPU
+		{827DBEC3-A270-4273-B69D-194A466BD35B}.Compatibility-GLFW3|Any CPU.Build.0 = Debug|Any CPU
+		{827DBEC3-A270-4273-B69D-194A466BD35B}.Core-GLFW3|Any CPU.ActiveCfg = Debug|Any CPU
+		{827DBEC3-A270-4273-B69D-194A466BD35B}.Core-GLFW3|Any CPU.Build.0 = Debug|Any CPU
+		{DDB6DB6D-E5DE-4BDB-8AC8-26DF800E9FF0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DDB6DB6D-E5DE-4BDB-8AC8-26DF800E9FF0}.Debug|x86.Build.0 = Debug|Any CPU
+		{DDB6DB6D-E5DE-4BDB-8AC8-26DF800E9FF0}.Release|x86.ActiveCfg = Release|Any CPU
+		{DDB6DB6D-E5DE-4BDB-8AC8-26DF800E9FF0}.Release|x86.Build.0 = Release|Any CPU
+		{DDB6DB6D-E5DE-4BDB-8AC8-26DF800E9FF0}.Compatibility-GLFW2|Any CPU.ActiveCfg = Compatibility-GLFW2|Any CPU
+		{DDB6DB6D-E5DE-4BDB-8AC8-26DF800E9FF0}.Compatibility-GLFW2|Any CPU.Build.0 = Compatibility-GLFW2|Any CPU
+		{DDB6DB6D-E5DE-4BDB-8AC8-26DF800E9FF0}.Core-GLFW2|Any CPU.ActiveCfg = Core-GLFW2|Any CPU
+		{DDB6DB6D-E5DE-4BDB-8AC8-26DF800E9FF0}.Core-GLFW2|Any CPU.Build.0 = Core-GLFW2|Any CPU
+		{DDB6DB6D-E5DE-4BDB-8AC8-26DF800E9FF0}.Compatibility-GLFW3|Any CPU.ActiveCfg = Compatibility-GLFW3|Any CPU
+		{DDB6DB6D-E5DE-4BDB-8AC8-26DF800E9FF0}.Compatibility-GLFW3|Any CPU.Build.0 = Compatibility-GLFW3|Any CPU
+		{DDB6DB6D-E5DE-4BDB-8AC8-26DF800E9FF0}.Core-GLFW3|Any CPU.ActiveCfg = Core-GLFW3|Any CPU
+		{DDB6DB6D-E5DE-4BDB-8AC8-26DF800E9FF0}.Core-GLFW3|Any CPU.Build.0 = Core-GLFW3|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -1,247 +1,217 @@
-﻿using Newtonsoft.Json;
-using Oddmatics.Tools.BinPacker.Metadata;
+﻿/**
+ * BitmapBinPacker.cs - Bin Packer Algorithm
+ *
+ * This source-code is part of rzxe - an experimental game engine by Oddmatics:
+ * <<https://www.oddmatics.uk>>
+ *
+ * Author(s): Rory Fewell <roryf@oddmatics.uk>
+ */
+
+using Newtonsoft.Json;
+using Oddmatics.Rzxe.Windowing.Graphics.Models;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Oddmatics.Tools.BinPacker.Algorithm
+namespace Oddmatics.Rzxe.Tools.BinPacker.Algorithm
 {
     /// <summary>
-    /// Represents a bin packer instance for generating an atlas bitmap.
+    /// Represents the bin packer algorithm for packing a bitmap.
     /// </summary>
-    internal sealed class BitmapBinPacker : IDisposable
+    internal sealed class BitmapBinPacker
     {
         /// <summary>
-        /// Gets the generated atlas.
+        /// The acceptable image formats for the bin packer.
         /// </summary>
-        public Bitmap Bitmap { get; private set; }
+        private static string[] AcceptedImageFormats = { "*.bmp", "*.png" };
+        
+        
+        /// <summary>
+        /// The bitmap atlas.
+        /// </summary>
+        private Bitmap Atlas { get; set; }
+        
+        /// <summary>
+        /// The intended size of the atlas.
+        /// </summary>
+        private Size AtlasSize { get; set; }
 
         /// <summary>
-        /// Gets or sets the available border-boxes in this
-        /// <see cref="BitmapBinPacker"/>.
+        /// The root node of bin packing.
         /// </summary>
-        public List<BorderBoxResource> BorderBoxes { get; private set; }
-
-        /// <summary>
-        /// Gets the value that indicates whether this <see cref="BitmapBinPacker"/>
-        /// has been disposed or not.
-        /// </summary>
-        public bool Disposed { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the available fonts in this <see cref="BitmapBinPacker"/>.
-        /// </summary>
-        public List<FontResource> Fonts { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the size of the atlas.
-        /// </summary>
-        public Size Size { get; set; }
-
-        /// <summary>
-        /// Gets or sets the source files to use when generating the atlas.
-        /// </summary>
-        public IList<string> SourceFiles { get; set; }
+        private BinPackerNode RootNode { get; set; }
 
 
         /// <summary>
-        /// The root node for the bin packing algorithm.
+        /// Initializes a new instance of the <see cref="BitmapBinPacker"/> class.
         /// </summary>
-        private BinPackerNode RootNode;
-
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="BitmapBinPacker"/>.
-        /// </summary>
-        public BitmapBinPacker()
+        /// <param name="size">
+        /// The size of the atlas.
+        /// </param>
+        public BitmapBinPacker(
+            Size size
+        )
         {
-            Bitmap = null;
-            Disposed = false;
-            Size = Size.Empty;
-            SourceFiles = new List<string>().AsReadOnly();
-            RootNode = null;
+            AtlasSize = size;
         }
-
-
+        
+        
         /// <summary>
-        /// Releases all resources used by this <see cref="BitmapBinPacker"/>.
+        /// Packs sprites into the atlas.
         /// </summary>
-        public void Dispose()
+        /// <param name="spriteRoot">
+        /// The root directory containing sprites.
+        /// </param>
+        public void PackSprites(
+            string spriteRoot
+        )
         {
-            AssertNotDisposed();
-        }
-
-        /// <summary>
-        /// Refreshes the generated atlas <see cref="Bitmap"/>.
-        /// </summary>
-        public void Refresh()
-        {
-            AssertNotDisposed();
-
-            // Get ourselves a clean Bitmap
+            IList<LoadedBitmap> sprites = GetSprites(spriteRoot);
+            
+            // Bin off existing state, if any
             //
-            var newBitmap = new Bitmap(Size.Width, Size.Height);
-
-            // Prepare our root node
-            //
-            RootNode = new BinPackerNode(
-                new Rectangle(0, 0, Size.Width, Size.Height),
-                null,
-                null,
-                null
-                );
-
-            // Now do the actual bin packing
-            //
-            var result = BinPackerError.None;
-            var ex = new Exception("Unknown error occurred.");
-
-            using (var g = Graphics.FromImage(newBitmap))
+            if (Atlas != null)
             {
-                foreach (string filePath in SourceFiles)
+                Atlas.Dispose();
+            }
+
+            Atlas    = new Bitmap(AtlasSize.Width, AtlasSize.Height);
+            RootNode = new BinPackerNode(
+                           new Rectangle(0, 0, AtlasSize.Width, AtlasSize.Height),
+                           null,
+                           null,
+                           null
+                       );
+            
+            using (var g = Graphics.FromImage(Atlas))
+            {
+                foreach (LoadedBitmap sprite in sprites)
                 {
-                    Bitmap sprite;
-                    string spriteName = Path.GetFileNameWithoutExtension(filePath);
-                    BinPackerNode node;
-
-                    if (!File.Exists(filePath))
-                    {
-                        result = BinPackerError.MissingFile;
-                        ex = new FileNotFoundException(
-                            "Failed to find a source file.",
-                            filePath
-                            );
-
-                        break;
-                    }
-
-                    try
-                    {
-                        sprite = (Bitmap)Bitmap.FromFile(filePath);
-                    }
-                    catch (Exception anyEx)
-                    {
-                        result = BinPackerError.UnreadableFile;
-                        ex = anyEx;
-
-                        break;
-                    }
-
-                    node = RootNode.Insert(
-                        RootNode,
-                        new Rectangle(Point.Empty, sprite.Size)
+                    BinPackerNode node =
+                        RootNode.Insert(
+                            RootNode,
+                            new Rectangle(Point.Empty, sprite.Bitmap.Size)
                         );
-
-                    if (node != null)
+                    
+                    // Check we successfully inserted the node
+                    //
+                    if (node == null)
                     {
-                        g.DrawImage(sprite, node.Bounds);
-                        node.LeafName = spriteName;
-                        sprite.Dispose();
+                        throw new InvalidOperationException(
+                            "Unable to add any more sprites, out of room!"
+                        );
                     }
-                    else
-                    {
-                        result = BinPackerError.OutOfRoom;
-                        ex = new InvalidOperationException(
-                            "There is not enough room in the atlas to contain all of the sprites."
-                            );
-                        sprite.Dispose();
+                    
+                    g.DrawImage(sprite.Bitmap, node.Bounds);
+                    node.LeafName = sprite.Name;
+                    
+                    sprite.Dispose();
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Saves the atlas data to the specified path.
+        /// </summary>
+        /// <param name="path">
+        /// The target file path, the extension will be ignored.
+        /// </param>
+        public void Save(
+            string path
+        )
+        {
+            string baseFilename = Path.GetFileNameWithoutExtension(path);
+            string directory    = Path.GetDirectoryName(path);
+            string finalNoExt   = Path.Combine(directory, baseFilename);
 
-                        break;
+            // Construct atlas metadata
+            //
+            var atlasModel = new AtlasModel();
+
+            BuildAtlasModel(RootNode, ref atlasModel);
+
+            // Now save
+            //
+            Atlas.Save(
+                $"{finalNoExt}.png"
+            );
+            File.WriteAllText(
+                $"{finalNoExt}.json",
+                JsonConvert.SerializeObject(atlasModel)
+            );
+        }
+        
+        
+        /// <summary>
+        /// Recursively builds the atlas model metadata from the bin packed data.
+        /// </summary>
+        /// <param name="currentNode">
+        /// The current node to read; if this is to be the first iteration, this should
+        /// be the root node.
+        /// </param>
+        /// <param name="atlasModel">
+        /// A reference to the <see cref="AtlasModel"/> being built.
+        /// </param>
+        private void BuildAtlasModel(
+            BinPackerNode  currentNode,
+            ref AtlasModel atlasModel
+        )
+        {
+            if (currentNode.LeftChild != null)
+            {
+                BuildAtlasModel(
+                    currentNode.LeftChild,
+                    ref atlasModel
+                );
+            }
+            
+            if (currentNode.RightChild != null)
+            {
+                BuildAtlasModel(
+                    currentNode.RightChild,
+                    ref atlasModel
+                );
+            }
+            
+            if (!string.IsNullOrWhiteSpace(currentNode.LeafName))
+            {
+                atlasModel.SpriteMappings.Add(
+                    new SpriteMappingModel()
+                    {
+                        Bounds = currentNode.Bounds,
+                        Name   = currentNode.LeafName
                     }
+                );
+            }
+        }
+
+        /// <summary>
+        /// Gets sprites from the specified directory.
+        /// </summary>
+        /// <param name="spriteRoot">
+        /// The root directory containing sprites.
+        /// </param>
+        /// <returns>
+        /// The list of sprites.
+        /// </returns>
+        private IList<LoadedBitmap> GetSprites(
+            string spriteRoot
+        )
+        {
+            var sprites = new List<LoadedBitmap>();
+            
+            foreach (string ext in AcceptedImageFormats)
+            {
+                var files = Directory.GetFiles(spriteRoot, ext);
+                
+                foreach (string file in files)
+                {
+                    sprites.Add(new LoadedBitmap(file));
                 }
             }
 
-            if (result != BinPackerError.None)
-                throw ex;
-
-            Bitmap?.Dispose();
-            Bitmap = newBitmap;
-        }
-
-        /// <summary>
-        /// Saves the atlas data to disk.
-        /// </summary>
-        /// <param name="fullFilePath">The full file path (minus extension) to save atlas information at.</param>
-        public void Save(string fullFilePath)
-        {
-            AssertNotDisposed();
-
-            string noExt = Path.GetFileNameWithoutExtension(fullFilePath);
-            string path = Path.GetDirectoryName(fullFilePath);
-
-            Bitmap.Save(path + "\\" + noExt + ".png");
-
-            IList<SpriteInfo> atlasInfo = BuildAtlas();
-
-            File.WriteAllText(
-                String.Format(
-                    @"{0}\\{1}.json",
-                    path,
-                    noExt
-                    ),
-                JsonConvert.SerializeObject(atlasInfo)
-                );
-        }
-
-
-        /// <summary>
-        /// Asserts that this <see cref="BitmapBinPacker"/> has not been disposed.
-        /// </summary>
-        private void AssertNotDisposed()
-        {
-            if (Disposed)
-            {
-                throw new ObjectDisposedException(
-                    "This BitmapBinPacker instance has been disposed."
-                    );
-            }
-        }
-
-        /// <summary>
-        /// Builds the atlas information for this <see cref="BitmapBinPacker"/>
-        /// instance.
-        /// </summary>
-        /// <returns>
-        /// A read-only <see cref="IList{SpriteInfo}"/> collection that contains all
-        /// information about the atlas.
-        /// </returns>
-        private IList<SpriteInfo> BuildAtlas()
-        {
-            var list = new List<SpriteInfo>();
-
-            DiscoverSprites(RootNode, ref list);
-
-            return list.AsReadOnly();
-        }
-
-        /// <summary>
-        /// Maps sprite information to the specified list recursively.
-        /// </summary>
-        /// <param name="currentNode">
-        /// The current node to discover sprites from; if this is to be the first
-        /// iteration, this should be the root node.
-        /// </param>
-        /// <param name="list">
-        /// A reference to the <see cref="List{SpriteInfo}"/> collection into which all
-        /// sprite information will be inserted.
-        /// </param>
-        private void DiscoverSprites(
-            BinPackerNode currentNode,
-            ref List<SpriteInfo> list
-            )
-        {
-            if (currentNode.LeftChild != null)
-                DiscoverSprites(currentNode.LeftChild, ref list);
-
-            if (currentNode.RightChild != null)
-                DiscoverSprites(currentNode.RightChild, ref list);
-
-            if (currentNode.LeafName != null)
-                list.Add(new SpriteInfo(currentNode.LeafName, currentNode.Bounds));
+            return sprites.AsReadOnly();
         }
     }
 }

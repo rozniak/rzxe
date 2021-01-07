@@ -38,6 +38,7 @@ namespace Oddmatics.Rzxe.Windowing.Graphics.Models
         public AtlasModel()
         {
             BorderBoxes    = new List<BorderBoxModel>();
+            Fonts          = new List<FontModel>();
             SpriteMappings = new List<SpriteMappingModel>();
         }
     }
