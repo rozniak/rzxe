@@ -1,5 +1,5 @@
 ﻿/**
- * AnimationServer.cs - Animation Server
+ * SpriteAnimationServer.cs - Sprite Animation Server
  *
  * This source-code is part of rzxe - an experimental game engine by Oddmatics:
  * <<https://www.oddmatics.uk>>
@@ -9,22 +9,22 @@
 
 using System;
 
-namespace Oddmatics.Rzxe.Game.Actors.Animation
+namespace Oddmatics.Rzxe.Game.Animation
 {
     /// <summary>
-    /// Represents an system for playing animations.
+    /// Represents a system for playing sprite-based animations.
     /// </summary>
-    public class AnimationServer
+    public class SpriteAnimationServer
     {
         /// <summary>
         /// The active animation.
         /// </summary>
-        private ActorAnimation ActiveAnimation { get; set; }
+        private SpriteAnimation ActiveAnimation { get; set; }
         
         /// <summary>
         /// The animation store.
         /// </summary>
-        private AnimationStore AnimationStore { get; set; }
+        private SpriteAnimationStore AnimationStore { get; set; }
         
         
         /// <summary>
@@ -56,13 +56,14 @@ namespace Oddmatics.Rzxe.Game.Actors.Animation
 
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AnimationServer"/> class.
+        /// Initializes a new instance of the <see cref="SpriteAnimationServer"/>
+        /// class.
         /// </summary>
         /// <param name="store">
         /// The animation store.
         /// </param>
-        public AnimationServer(
-            AnimationStore store
+        public SpriteAnimationServer(
+            SpriteAnimationStore store
         )
         {
             AnimationStore = store;
@@ -75,7 +76,7 @@ namespace Oddmatics.Rzxe.Game.Actors.Animation
         /// <returns>
         /// The current frame of the animation.
         /// </returns>
-        public ActorAnimationFrame GetCurrentFrame()
+        public SpriteAnimationFrame GetCurrentFrame()
         {
             return ActiveAnimation?.CurrentFrame;
         }

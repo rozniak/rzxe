@@ -1,5 +1,5 @@
 ﻿/**
- * ActorAnimation.cs - Actor Animation
+ * SpriteAnimation.cs - Sprite Animation
  *
  * This source-code is part of rzxe - an experimental game engine by Oddmatics:
  * <<https://www.oddmatics.uk>>
@@ -8,21 +8,21 @@
  */
 
 using Oddmatics.Rzxe.Extensions;
-using Oddmatics.Rzxe.Game.Actors.Animation.Models;
+using Oddmatics.Rzxe.Game.Animation.Models;
 using System;
 using System.Collections.Generic;
 
-namespace Oddmatics.Rzxe.Game.Actors.Animation
+namespace Oddmatics.Rzxe.Game.Animation
 {
     /// <summary>
-    /// Represents an animation for an actor.
+    /// Represents a sprite-based animation.
     /// </summary>
-    public class ActorAnimation
+    public class SpriteAnimation
     {
         /// <summary>
         /// Gets the current frame.
         /// </summary>
-        public ActorAnimationFrame CurrentFrame
+        public SpriteAnimationFrame CurrentFrame
         {
             get { return Frameset[CurrentFrameIndex]; }
         }
@@ -64,7 +64,7 @@ namespace Oddmatics.Rzxe.Game.Actors.Animation
         /// <summary>
         /// The animation's frameset.
         /// </summary>
-        private IList<ActorAnimationFrame> Frameset { get; set; }
+        private IList<SpriteAnimationFrame> Frameset { get; set; }
 
         /// <summary>
         /// The length of a single tick when stepping through the animation.
@@ -89,31 +89,37 @@ namespace Oddmatics.Rzxe.Game.Actors.Animation
 
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ActorAnimation"/> class.
+        /// Initializes a new instance of the <see cref="SpriteAnimation"/> class.
         /// </summary>
         /// <param name="animModel">
         /// The data model that contains information about the animation.
         /// </param>
-        internal ActorAnimation(
-            AnimationModel animModel
+        internal SpriteAnimation(
+            SpriteAnimationModel animModel
         )
         {
             CurrentFrameIndex = 0;
             CurrentTime       = TimeSpan.Zero;
-            Frameset          = animModel.Frames.AsReadOnly();
             IsPlaying         = false;
             Name              = animModel.Name;
             TickSize          = TimeSpan.FromMilliseconds(animModel.TickSize);
 
-            // Calculate total duration
+            // Construct frameset and calculate total duration
             //
-            foreach (ActorAnimationFrame frame in Frameset)
+            var frameset = new List<SpriteAnimationFrame>();
+            
+            foreach (SpriteAnimationFrameModel frame in animModel.Frames)
             {
+                frameset.Add(
+                    new SpriteAnimationFrame(frame)
+                );
                 TotalDuration =
                     TotalDuration.Add(
                         TickSize.Multiply(frame.Ticks)
                     );
             }
+
+            Frameset = frameset.AsReadOnly();
         }
         
         

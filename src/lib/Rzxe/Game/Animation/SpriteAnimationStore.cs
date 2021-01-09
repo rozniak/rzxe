@@ -1,5 +1,5 @@
 ﻿/**
- * AnimationStore.cs - Actor Animation Store
+ * SpriteAnimationStore.cs - Sprite Animation Store
  *
  * This source-code is part of rzxe - an experimental game engine by Oddmatics:
  * <<https://www.oddmatics.uk>>
@@ -8,34 +8,34 @@
  */
 
 using Newtonsoft.Json;
-using Oddmatics.Rzxe.Game.Actors.Animation.Models;
+using Oddmatics.Rzxe.Game.Animation.Models;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Oddmatics.Rzxe.Game.Actors.Animation
+namespace Oddmatics.Rzxe.Game.Animation
 {
     /// <summary>
-    /// Represents a store for actor animations.
+    /// Represents a store for sprite-based animations.
     /// </summary>
-    public class AnimationStore
+    public class SpriteAnimationStore
     {
         /// <summary>
         /// The internal store for animations by their names.
         /// </summary>
-        private Dictionary<string, AnimationModel> Animations { get; set; }
+        private Dictionary<string, SpriteAnimationModel> Animations { get; set; }
         
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="AnimationStore"/> class.
+        /// Initializes a new instance of the <see cref="SpriteAnimationStore"/> class.
         /// </summary>
         /// <param name="engineParameters">
         /// The game engine parameters.
         /// </param>
-        public AnimationStore(
+        public SpriteAnimationStore(
             IGameEngineParameters engineParameters
         )
         {
-            Animations = new Dictionary<string, AnimationModel>();
+            Animations = new Dictionary<string, SpriteAnimationModel>();
         
             // Collect all animations from the content directory and load them
             //
@@ -64,11 +64,11 @@ namespace Oddmatics.Rzxe.Game.Actors.Animation
         /// <returns>
         /// The animation of the specified name from the store.
         /// </returns>
-        public ActorAnimation GetAnimation(
+        public SpriteAnimation GetAnimation(
             string animName
         )
         {
-            return new ActorAnimation(Animations[animName]);
+            return new SpriteAnimation(Animations[animName]);
         }
 
 
@@ -83,9 +83,11 @@ namespace Oddmatics.Rzxe.Game.Actors.Animation
         )
         {
             string fileSrc = File.ReadAllText(filename);
-            var    models  = JsonConvert.DeserializeObject<AnimationModel[]>(fileSrc);
+            var    models  = JsonConvert.DeserializeObject<SpriteAnimationModel[]>(
+                                 fileSrc
+                             );
             
-            foreach (AnimationModel model in models)
+            foreach (SpriteAnimationModel model in models)
             {
                 Animations.Add(model.Name, model);
             }

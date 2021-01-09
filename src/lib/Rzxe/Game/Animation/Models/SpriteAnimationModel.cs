@@ -1,5 +1,5 @@
 ﻿/**
- * AnimationModel.cs - Animation Model
+ * SpriteAnimationModel.cs - Sprite Animation Model
  *
  * This source-code is part of rzxe - an experimental game engine by Oddmatics:
  * <<https://www.oddmatics.uk>>
@@ -8,21 +8,20 @@
  */
 
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 
-namespace Oddmatics.Rzxe.Game.Actors.Animation.Models
+namespace Oddmatics.Rzxe.Game.Animation.Models
 {
     /// <summary>
-    /// Represents a data model for animation information.
+    /// Represents a data model for a sprite-based animation.
     /// </summary>
-    internal sealed class AnimationModel
+    internal sealed class SpriteAnimationModel
     {
         /// <summary>
         /// Gets or sets the collection of frames in the animation.
         /// </summary>
         [JsonProperty(PropertyName = "frames")]
-        public List<ActorAnimationFrame> Frames { get; set; }
+        public List<SpriteAnimationFrameModel> Frames { get; set; }
         
         /// <summary>
         /// Gets or sets the name of the animation.
@@ -39,11 +38,11 @@ namespace Oddmatics.Rzxe.Game.Actors.Animation.Models
         
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="AnimationModel"/> class.
+        /// Initializes a new instance of the <see cref="SpriteAnimationModel"/> class.
         /// </summary>
-        public AnimationModel()
+        public SpriteAnimationModel()
         {
-            Frames   = new List<ActorAnimationFrame>();
+            Frames   = new List<SpriteAnimationFrameModel>();
             Name     = string.Empty;
             TickSize = 0;
         }
