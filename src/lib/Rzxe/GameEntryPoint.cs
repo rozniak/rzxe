@@ -98,10 +98,9 @@ namespace Oddmatics.Rzxe
             // Enter the main game loop
             //
             var gameTime = new Stopwatch();
-
-            gameTime.Start();
+            
             GameEngine.Begin();
-
+            
             while (WindowManager.IsOpen)
             {
                 TimeSpan deltaTime = gameTime.Elapsed;
