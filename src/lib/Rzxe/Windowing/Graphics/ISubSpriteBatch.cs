@@ -33,9 +33,13 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
         /// <param name="location">
         /// The location to draw the sprite.
         /// </param>
+        /// <param name="alpha">
+        /// The opacity at which to draw the sprite.
+        /// </param>
         void Draw(
             ISprite sprite,
-            Point   location
+            Point   location,
+            float   alpha = 1.0f
         );
         
         /// <summary>
@@ -47,9 +51,13 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
         /// <param name="location">
         /// The location to draw the region.
         /// </param>
+        /// <param name="alpha">
+        /// The opacity at which to draw the sprite.
+        /// </param>
         void Draw(
             Rectangle sourceRect,
-            Point     location
+            Point     location,
+            float     alpha = 1.0f
         );
         
         /// <summary>
@@ -65,10 +73,14 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
         /// <param name="drawMode">
         /// The mode that defines how the sprite should be drawn.
         /// </param>
+        /// <param name="alpha">
+        /// The opacity at which to draw the sprite.
+        /// </param>
         void Draw(
             ISprite   sprite,
             Rectangle destRect,
-            DrawMode  drawMode
+            DrawMode  drawMode,
+            float     alpha = 1.0f
         );
         
         /// <summary>
@@ -84,10 +96,14 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
         /// <param name="drawMode">
         /// The mode that defines how the region should be drawn.
         /// </param>
+        /// <param name="alpha">
+        /// The opacity at which to draw the sprite.
+        /// </param>
         void Draw(
             Rectangle sourceRect,
             Rectangle destRect,
-            DrawMode  drawMode
+            DrawMode  drawMode,
+            float     alpha = 1.0f
         );
         
         /// <summary>
@@ -99,9 +115,13 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
         /// <param name="destRect">
         /// The region to draw into.
         /// </param>
+        /// <param name="alpha">
+        /// The opacity at which to draw the border box.
+        /// </param>
         void DrawBorderBox(
             IBorderBoxResource borderBox,
-            Rectangle          destRect
+            Rectangle          destRect,
+            float              alpha = 1.0f
         );
         
         /// <summary>

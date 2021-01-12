@@ -120,48 +120,75 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         /// <inheritdoc />
         public void Draw(
             ISprite sprite,
-            Point   location
+            Point   location,
+            float   alpha = 1.0f
         )
         {
-            ComposerSubBatch.Draw(sprite, location);
+            ComposerSubBatch.Draw(
+                sprite,
+                location,
+                alpha
+            );
         }
         
         /// <inheritdoc />
         public void Draw(
             System.Drawing.Rectangle sourceRect,
-            Point                    location        
+            Point                    location,
+            float                    alpha = 1.0f     
         )
         {
-            ComposerSubBatch.Draw(sourceRect, location);
+            ComposerSubBatch.Draw(
+                sourceRect,
+                location,
+                alpha
+            );
         }
         
         /// <inheritdoc />
         public void Draw(
             ISprite                  sprite,
             System.Drawing.Rectangle destRect,
-            DrawMode                 drawMode
+            DrawMode                 drawMode,
+            float                    alpha = 1.0f
         )
         {
-            ComposerSubBatch.Draw(sprite, destRect, drawMode);
+            ComposerSubBatch.Draw(
+                sprite,
+                destRect,
+                drawMode,
+                alpha
+            );
         }
         
         /// <inheritdoc />
         public void Draw(
             System.Drawing.Rectangle sourceRect,
             System.Drawing.Rectangle destRect,
-            DrawMode                 drawMode
+            DrawMode                 drawMode,
+            float                    alpha = 1.0f
         )
         {
-            ComposerSubBatch.Draw(sourceRect, destRect, drawMode);
+            ComposerSubBatch.Draw(
+                sourceRect,
+                destRect,
+                drawMode,
+                alpha
+            );
         }
         
         /// <inheritdoc />
         public void DrawBorderBox(
             IBorderBoxResource       borderBox,
-            System.Drawing.Rectangle destRect
+            System.Drawing.Rectangle destRect,
+            float                    alpha = 1.0f
         )
         {
-            ComposerSubBatch.DrawBorderBox(borderBox, destRect);
+            ComposerSubBatch.DrawBorderBox(
+                borderBox,
+                destRect,
+                alpha
+            );
         }
         
         /// <inheritdoc />
@@ -192,12 +219,14 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             int vboVsSourceRectId     = GL.GenBuffer();
             int vboVsOriginId         = GL.GenBuffer();
             int vboVsDrawModeId       = GL.GenBuffer();
+            int vboVsAlphaScaleId     = GL.GenBuffer();
 
             float[] vsVertexPositionData = ComposerSubBatch.VboDrawContents.ToArray();
             float[] vsVertexUVData       = ComposerSubBatch.VboUvContents.ToArray();
             float[] vsSourceRectData     = ComposerSubBatch.VboSourceRects.ToArray();
             float[] vsOriginData         = ComposerSubBatch.VboOrigins.ToArray();
             float[] vsDrawModeData       = ComposerSubBatch.VboDrawModes.ToArray();
+            float[] vsAlphaScaleData     = ComposerSubBatch.VboAlphaScales.ToArray();
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, vboVsVertexPositionId);
             GL.BufferData(
@@ -236,6 +265,14 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                 BufferTarget.ArrayBuffer,
                 new IntPtr(sizeof(float) * vsDrawModeData.Length),
                 vsDrawModeData,
+                BufferUsageHint.StreamDraw
+            );
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, vboVsAlphaScaleId);
+            GL.BufferData(
+                BufferTarget.ArrayBuffer,
+                new IntPtr(sizeof(float) * vsAlphaScaleData.Length),
+                vsAlphaScaleData,
                 BufferUsageHint.StreamDraw
             );
 
@@ -318,6 +355,21 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                 0
             );
 
+            Console.WriteLine(
+                GL.GetAttribLocation(GlProgramId, "vsAlphaScale")
+            );
+
+            GL.EnableVertexAttribArray(5);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, vboVsAlphaScaleId);
+            GL.VertexAttribPointer(
+                5,
+                1,
+                VertexAttribPointerType.Float,
+                false,
+                0,
+                0
+            );
+
             // Draw now!
             //
             GL.DrawArrays(BeginMode.Triangles, 0, ComposerSubBatch.VertexCount);
@@ -329,12 +381,14 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             GL.DisableVertexAttribArray(2);
             GL.DisableVertexAttribArray(3);
             GL.DisableVertexAttribArray(4);
+            GL.DisableVertexAttribArray(5);
 
             GL.DeleteBuffer(vboVsVertexPositionId);
             GL.DeleteBuffer(vboVsVertexUVId);
             GL.DeleteBuffer(vboVsSourceRectId);
             GL.DeleteBuffer(vboVsOriginId);
             GL.DeleteBuffer(vboVsDrawModeId);
+            GL.DeleteBuffer(vboVsAlphaScaleId);
         }
     }
 }

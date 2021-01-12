@@ -25,6 +25,16 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         
         /// <summary>
         /// Gets the collection of floating-point values that will populate a VBO with
+        /// alpha component data for scaling alpha on sampled textures.
+        /// </summary>
+        public IList<float> VboAlphaScales
+        {
+            get { return _VboAlphaScales.AsReadOnly(); }
+        }
+        private List<float> _VboAlphaScales;
+
+        /// <summary>
+        /// Gets the collection of floating-point values that will populate a VBO with
         /// target vertex data.
         /// </summary>
         public IList<float> VboDrawContents
@@ -98,7 +108,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         {
             Atlas = atlas;
             
-            VertexCount     = 0;
+            VertexCount      = 0;
+            _VboAlphaScales  = new List<float>();
             _VboDrawContents = new List<float>();
             _VboDrawModes    = new List<float>();
             _VboOrigins      = new List<float>();
@@ -110,7 +121,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         /// <inheritdoc />
         public void Draw(
             ISprite sprite,
-            Point   location
+            Point   location,
+            float   alpha = 1.0f
         )
         {
             Draw(
@@ -122,7 +134,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         /// <inheritdoc />
         public void Draw(
             System.Drawing.Rectangle sourceRect,
-            Point                    location
+            Point                    location,
+            float                    alpha = 1.0f
         )
         {
             Draw(
@@ -132,7 +145,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                     sourceRect.Width,
                     sourceRect.Height
                 ),
-                location
+                location,
+                alpha
             );
         }
         
@@ -140,13 +154,15 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         public void Draw(
             ISprite                  sprite,
             System.Drawing.Rectangle destRect,
-            DrawMode                 drawMode
+            DrawMode                 drawMode,
+            float                    alpha = 1.0f
         )
         {
             Draw(
                 ((GLSprite) sprite).Bounds,
                 destRect,
-                drawMode
+                drawMode,
+                alpha
             );
         }
         
@@ -154,7 +170,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         public void Draw(
             System.Drawing.Rectangle sourceRect,
             System.Drawing.Rectangle destRect,
-            DrawMode                 drawMode
+            DrawMode                 drawMode,
+            float                    alpha = 1.0f
         )
         {
             Draw(
@@ -170,14 +187,16 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                     destRect.Width,
                     destRect.Height
                 ),
-                drawMode
+                drawMode,
+                alpha
             );
         }
         
         /// <inheritdoc />
         public void DrawBorderBox(
             IBorderBoxResource       borderBox,
-            System.Drawing.Rectangle destRect
+            System.Drawing.Rectangle destRect,
+            float                    alpha = 1.0f
         )
         {
             //
@@ -205,7 +224,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             //
             Draw(
                 tl,
-                destRect.Location
+                destRect.Location,
+                alpha
             );
             
             Draw(
@@ -216,7 +236,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                     destRect.Width - tl.Width - tr.Width,
                     tm.Height
                 ),
-                DrawMode.Tiled
+                DrawMode.Tiled,
+                alpha
             );
             
             Draw(
@@ -224,7 +245,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                 new Point(
                     destRect.Right - tr.Width,
                     destRect.Y
-                )
+                ),
+                alpha
             );
             
             // Middle section
@@ -237,7 +259,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                     ml.Width,
                     destRect.Height - tl.Height - bl.Height
                 ),
-                DrawMode.Tiled
+                DrawMode.Tiled,
+                alpha
             );
             
             Draw(
@@ -248,7 +271,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                     destRect.Width - ml.Width - mr.Width,
                     destRect.Height - tm.Height - bm.Height
                 ),
-                DrawMode.Tiled
+                DrawMode.Tiled,
+                alpha
             );
             
             Draw(
@@ -259,7 +283,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                     mr.Width,
                     destRect.Height - tr.Height - br.Height
                 ),
-                DrawMode.Tiled
+                DrawMode.Tiled,
+                alpha
             );
             
             // Bottom section
@@ -269,7 +294,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                 new Point(
                     destRect.X,
                     destRect.Bottom - bl.Height
-                )
+                ),
+                alpha
             );
             
             Draw(
@@ -280,7 +306,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                     destRect.Width - bl.Width - br.Width,
                     bm.Height
                 ),
-                DrawMode.Tiled
+                DrawMode.Tiled,
+                alpha
             );
             
             Draw(
@@ -288,7 +315,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                 new Point(
                     destRect.Right - br.Width,
                     destRect.Bottom - br.Height
-                )
+                ),
+                alpha
             );
         }
         
@@ -332,6 +360,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             _VboOrigins.AddRange(otherBatch.VboOrigins);
             _VboSourceRects.AddRange(otherBatch.VboSourceRects);
             _VboUvContents.AddRange(otherBatch.VboUvContents);
+            _VboAlphaScales.AddRange(otherBatch.VboAlphaScales);
 
             VertexCount += otherBatch.VertexCount;
         }
@@ -402,9 +431,13 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         /// <param name="location">
         /// The location to draw the region.
         /// </param>
+        /// <param name="alpha">
+        /// The opacity at which to draw the border box.
+        /// </param>
         private void Draw(
             Rectanglei sourceRect,
-            Point      location
+            Point      location,
+            float      alpha
         )
         {
             Draw(
@@ -419,7 +452,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                         sourceRect.Height
                     )
                 ),
-                DrawMode.Stretch
+                DrawMode.Stretch,
+                alpha
             );
         }
         
@@ -436,10 +470,14 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         /// <param name="drawMode">
         /// The mode that defines how the sprite should be drawn.
         /// </param>
+        /// <param name="alpha">
+        /// The opacity at which to draw the sprite.
+        /// </param>
         private void Draw(
             Rectanglei sourceRect,
             Rectanglei destRect,
-            DrawMode   drawMode
+            DrawMode   drawMode,
+            float      alpha
         )
         {
             _VboDrawContents.AddRange(GLUtility.MakeVboData(destRect));
@@ -455,6 +493,10 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             
             _VboDrawModes.AddRange(
                 CloneVbo((float) drawMode, 6)
+            );
+
+            _VboAlphaScales.AddRange(
+                CloneVbo(alpha, 6)
             );
 
             VertexCount += 6;

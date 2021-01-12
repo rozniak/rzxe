@@ -13,6 +13,7 @@ in vec2  fsUV;
 in vec4  fsSourceRect;
 in vec2  fsOrigin;
 in float fsDrawMode;
+in float fsAlphaScale;
 
 out vec4 outColor;
 
@@ -30,6 +31,16 @@ vec2 makeRelative(
         point.x / factor.x,
         1.0 - (point.y / factor.y)
     );
+}
+
+float scaleAlpha(
+    in float sourceAlpha,
+    in float scale
+)
+{
+    float diff = sourceAlpha - (1.0 - scale);
+    
+    return clamp(diff, 0.0, 1.0);
 }
 
 
@@ -62,6 +73,14 @@ void main()
             naturalUV,
             gUvMapResolution
         );
-
-    outColor = texture(TextureSampler, scaledUV).rgba;
+    
+    // Deal with final colour manipulation
+    //
+    vec4 sampled = texture(TextureSampler, scaledUV);
+    
+    outColor =
+        vec4(
+            sampled.rgb,
+            scaleAlpha(sampled.a, fsAlphaScale)
+        );
 }

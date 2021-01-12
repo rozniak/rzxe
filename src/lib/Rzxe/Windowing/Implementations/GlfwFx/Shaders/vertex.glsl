@@ -14,11 +14,13 @@ layout(location = 1) in vec2  vsVertexUV;
 layout(location = 2) in vec4  vsSourceRect;
 layout(location = 3) in vec2  vsOrigin;
 layout(location = 4) in float vsDrawMode;
+layout(location = 5) in float vsAlphaScale;
 
 out vec2  fsUV;
 out vec4  fsSourceRect;
 out vec2  fsOrigin;
 out float fsDrawMode;
+out float fsAlphaScale;
 
 uniform vec2 gCanvasResolution;
 
@@ -61,4 +63,5 @@ void main()
     fsSourceRect = vsSourceRect;
     fsOrigin     = vsOrigin;
     fsDrawMode   = vsDrawMode;
+    fsAlphaScale = vsAlphaScale;
 }
