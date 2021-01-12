@@ -9,9 +9,7 @@
 
 using Oddmatics.Rzxe.Windowing.Graphics;
 using Pencil.Gaming.Graphics;
-using Pencil.Gaming.MathUtils;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
@@ -121,12 +119,14 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         public void Draw(
             ISprite sprite,
             Point   location,
+            Color   tint,
             float   alpha = 1.0f
         )
         {
             ComposerSubBatch.Draw(
                 sprite,
                 location,
+                tint,
                 alpha
             );
         }
@@ -135,12 +135,14 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         public void Draw(
             System.Drawing.Rectangle sourceRect,
             Point                    location,
+            Color                    tint,
             float                    alpha = 1.0f     
         )
         {
             ComposerSubBatch.Draw(
                 sourceRect,
                 location,
+                tint,
                 alpha
             );
         }
@@ -150,6 +152,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             ISprite                  sprite,
             System.Drawing.Rectangle destRect,
             DrawMode                 drawMode,
+            Color                    tint,
             float                    alpha = 1.0f
         )
         {
@@ -157,6 +160,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                 sprite,
                 destRect,
                 drawMode,
+                tint,
                 alpha
             );
         }
@@ -166,6 +170,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             System.Drawing.Rectangle sourceRect,
             System.Drawing.Rectangle destRect,
             DrawMode                 drawMode,
+            Color                    tint,
             float                    alpha = 1.0f
         )
         {
@@ -173,6 +178,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                 sourceRect,
                 destRect,
                 drawMode,
+                tint,
                 alpha
             );
         }
@@ -181,12 +187,14 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         public void DrawBorderBox(
             IBorderBoxResource       borderBox,
             System.Drawing.Rectangle destRect,
+            Color                    tint,
             float                    alpha = 1.0f
         )
         {
             ComposerSubBatch.DrawBorderBox(
                 borderBox,
                 destRect,
+                tint,
                 alpha
             );
         }
@@ -195,10 +203,16 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         public void DrawString(
             string text,
             IFont  font,
-            Point  location
+            Point  location,
+            Color  color
         )
         {
-            ComposerSubBatch.DrawString(text, font, location);
+            ComposerSubBatch.DrawString(
+                text,
+                font,
+                location,
+                color
+            );
         }
         
         /// <inheritdoc />
@@ -219,6 +233,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             int vboVsSourceRectId     = GL.GenBuffer();
             int vboVsOriginId         = GL.GenBuffer();
             int vboVsDrawModeId       = GL.GenBuffer();
+            int vboVsTintId           = GL.GenBuffer();
             int vboVsAlphaScaleId     = GL.GenBuffer();
 
             float[] vsVertexPositionData = ComposerSubBatch.VboDrawContents.ToArray();
@@ -226,6 +241,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             float[] vsSourceRectData     = ComposerSubBatch.VboSourceRects.ToArray();
             float[] vsOriginData         = ComposerSubBatch.VboOrigins.ToArray();
             float[] vsDrawModeData       = ComposerSubBatch.VboDrawModes.ToArray();
+            float[] vsTintData           = ComposerSubBatch.VboTints.ToArray();
             float[] vsAlphaScaleData     = ComposerSubBatch.VboAlphaScales.ToArray();
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, vboVsVertexPositionId);
@@ -265,6 +281,14 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                 BufferTarget.ArrayBuffer,
                 new IntPtr(sizeof(float) * vsDrawModeData.Length),
                 vsDrawModeData,
+                BufferUsageHint.StreamDraw
+            );
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, vboVsTintId);
+            GL.BufferData(
+                BufferTarget.ArrayBuffer,
+                new IntPtr(sizeof(float) * vsTintData.Length),
+                vsTintData,
                 BufferUsageHint.StreamDraw
             );
 
@@ -355,14 +379,21 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                 0
             );
 
-            Console.WriteLine(
-                GL.GetAttribLocation(GlProgramId, "vsAlphaScale")
-            );
-
             GL.EnableVertexAttribArray(5);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, vboVsAlphaScaleId);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, vboVsTintId);
             GL.VertexAttribPointer(
                 5,
+                4,
+                VertexAttribPointerType.Float,
+                false,
+                0,
+                0
+            );
+            
+            GL.EnableVertexAttribArray(6);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, vboVsAlphaScaleId);
+            GL.VertexAttribPointer(
+                6,
                 1,
                 VertexAttribPointerType.Float,
                 false,
@@ -382,12 +413,14 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             GL.DisableVertexAttribArray(3);
             GL.DisableVertexAttribArray(4);
             GL.DisableVertexAttribArray(5);
+            GL.DisableVertexAttribArray(6);
 
             GL.DeleteBuffer(vboVsVertexPositionId);
             GL.DeleteBuffer(vboVsVertexUVId);
             GL.DeleteBuffer(vboVsSourceRectId);
             GL.DeleteBuffer(vboVsOriginId);
             GL.DeleteBuffer(vboVsDrawModeId);
+            GL.DeleteBuffer(vboVsTintId);
             GL.DeleteBuffer(vboVsAlphaScaleId);
         }
     }

@@ -13,6 +13,7 @@ in vec2  fsUV;
 in vec4  fsSourceRect;
 in vec2  fsOrigin;
 in float fsDrawMode;
+in vec4  fsTint;
 in float fsAlphaScale;
 
 out vec4 outColor;
@@ -41,6 +42,18 @@ float scaleAlpha(
     float diff = sourceAlpha - (1.0 - scale);
     
     return clamp(diff, 0.0, 1.0);
+}
+
+vec3 tint(
+    in vec3 baseColor,
+    in vec4 tintColor
+)
+{
+    return vec3(
+        (tintColor.r * tintColor.a) + ((1 - tintColor.a) * baseColor.r),
+        (tintColor.g * tintColor.a) + ((1 - tintColor.a) * baseColor.g),
+        (tintColor.b * tintColor.a) + ((1 - tintColor.a) * baseColor.b)
+    );
 }
 
 
@@ -77,10 +90,11 @@ void main()
     // Deal with final colour manipulation
     //
     vec4 sampled = texture(TextureSampler, scaledUV);
+    vec3 tinted  = tint(sampled.rgb, fsTint);
     
     outColor =
         vec4(
-            sampled.rgb,
+            tinted,
             scaleAlpha(sampled.a, fsAlphaScale)
         );
 }

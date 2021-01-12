@@ -85,6 +85,16 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         
         /// <summary>
         /// Gets the collection of floating-point values that will populate a VBO with
+        /// colour tinting data.
+        /// </summary>
+        public IList<float> VboTints
+        {
+            get { return _VboTints; }
+        }
+        private List<float> _VboTints;
+
+        /// <summary>
+        /// Gets the collection of floating-point values that will populate a VBO with
         /// UV vertex data.
         /// </summary>
         public IList<float> VboUvContents
@@ -102,6 +112,9 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         /// <summary>
         /// Initializes a new instance of the <see cref="GLSubSpriteBatch"/> class.
         /// </summary>
+        /// <param name="atlas">
+        /// The sprite atlas to use.
+        /// </param>
         public GLSubSpriteBatch(
             GLSpriteAtlas atlas
         )
@@ -114,6 +127,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             _VboDrawModes    = new List<float>();
             _VboOrigins      = new List<float>();
             _VboSourceRects  = new List<float>();
+            _VboTints        = new List<float>();
             _VboUvContents   = new List<float>();
         }
         
@@ -122,12 +136,15 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         public void Draw(
             ISprite sprite,
             Point   location,
+            Color   tint,
             float   alpha = 1.0f
         )
         {
             Draw(
                 ((GLSprite) sprite).Bounds,
-                location
+                location,
+                tint,
+                alpha
             );
         }
         
@@ -135,6 +152,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         public void Draw(
             System.Drawing.Rectangle sourceRect,
             Point                    location,
+            Color                    tint,
             float                    alpha = 1.0f
         )
         {
@@ -146,6 +164,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                     sourceRect.Height
                 ),
                 location,
+                tint,
                 alpha
             );
         }
@@ -155,6 +174,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             ISprite                  sprite,
             System.Drawing.Rectangle destRect,
             DrawMode                 drawMode,
+            Color                    tint,
             float                    alpha = 1.0f
         )
         {
@@ -162,6 +182,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                 ((GLSprite) sprite).Bounds,
                 destRect,
                 drawMode,
+                tint,
                 alpha
             );
         }
@@ -171,6 +192,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             System.Drawing.Rectangle sourceRect,
             System.Drawing.Rectangle destRect,
             DrawMode                 drawMode,
+            Color                    tint,
             float                    alpha = 1.0f
         )
         {
@@ -188,6 +210,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                     destRect.Height
                 ),
                 drawMode,
+                tint,
                 alpha
             );
         }
@@ -196,6 +219,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         public void DrawBorderBox(
             IBorderBoxResource       borderBox,
             System.Drawing.Rectangle destRect,
+            Color                    tint,
             float                    alpha = 1.0f
         )
         {
@@ -225,6 +249,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             Draw(
                 tl,
                 destRect.Location,
+                tint,
                 alpha
             );
             
@@ -237,6 +262,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                     tm.Height
                 ),
                 DrawMode.Tiled,
+                tint,
                 alpha
             );
             
@@ -246,6 +272,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                     destRect.Right - tr.Width,
                     destRect.Y
                 ),
+                tint,
                 alpha
             );
             
@@ -260,6 +287,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                     destRect.Height - tl.Height - bl.Height
                 ),
                 DrawMode.Tiled,
+                tint,
                 alpha
             );
             
@@ -272,6 +300,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                     destRect.Height - tm.Height - bm.Height
                 ),
                 DrawMode.Tiled,
+                tint,
                 alpha
             );
             
@@ -284,6 +313,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                     destRect.Height - tr.Height - br.Height
                 ),
                 DrawMode.Tiled,
+                tint,
                 alpha
             );
             
@@ -295,6 +325,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                     destRect.X,
                     destRect.Bottom - bl.Height
                 ),
+                tint,
                 alpha
             );
             
@@ -307,6 +338,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                     bm.Height
                 ),
                 DrawMode.Tiled,
+                tint,
                 alpha
             );
             
@@ -316,6 +348,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                     destRect.Right - br.Width,
                     destRect.Bottom - br.Height
                 ),
+                tint,
                 alpha
             );
         }
@@ -324,7 +357,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         public void DrawString(
             string text,
             IFont  font,
-            Point  location
+            Point  location,
+            Color  color
         )
         {
             switch (font.FontKind)
@@ -333,7 +367,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                     DrawStringWithSpriteFont(
                         text,
                         (GLSpriteFont) font,
-                        location
+                        location,
+                        color
                     );
                     
                     break;
@@ -355,12 +390,14 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             GLSubSpriteBatch otherBatch
         )
         {
+            _VboAlphaScales.AddRange(otherBatch.VboAlphaScales);
             _VboDrawContents.AddRange(otherBatch.VboDrawContents);
             _VboDrawModes.AddRange(otherBatch.VboDrawModes);
             _VboOrigins.AddRange(otherBatch.VboOrigins);
             _VboSourceRects.AddRange(otherBatch.VboSourceRects);
+            _VboTints.AddRange(otherBatch.VboTints);
             _VboUvContents.AddRange(otherBatch.VboUvContents);
-            _VboAlphaScales.AddRange(otherBatch.VboAlphaScales);
+            
 
             VertexCount += otherBatch.VertexCount;
         }
@@ -431,12 +468,17 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         /// <param name="location">
         /// The location to draw the region.
         /// </param>
+        /// <param name="tint">
+        /// The colour to tint the sprite with, specify
+        /// <see cref="Color.Transparent"/> for no tinting.
+        /// </param>
         /// <param name="alpha">
         /// The opacity at which to draw the border box.
         /// </param>
         private void Draw(
             Rectanglei sourceRect,
             Point      location,
+            Color      tint,
             float      alpha
         )
         {
@@ -453,6 +495,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                     )
                 ),
                 DrawMode.Stretch,
+                tint,
                 alpha
             );
         }
@@ -470,6 +513,10 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         /// <param name="drawMode">
         /// The mode that defines how the sprite should be drawn.
         /// </param>
+        /// <param name="tint">
+        /// The colour to tint the sprite with, specify
+        /// <see cref="Color.Transparent"/> for no tinting.
+        /// </param>
         /// <param name="alpha">
         /// The opacity at which to draw the sprite.
         /// </param>
@@ -477,6 +524,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             Rectanglei sourceRect,
             Rectanglei destRect,
             DrawMode   drawMode,
+            Color      tint,
             float      alpha
         )
         {
@@ -499,6 +547,10 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                 CloneVbo(alpha, 6)
             );
 
+            _VboTints.AddRange(
+                CloneVbo(GLUtility.MakeVboData(tint), 6)
+            );
+
             VertexCount += 6;
         }
 
@@ -514,12 +566,29 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         /// <param name="location">
         /// The location to draw the string.
         /// </param>
+        /// <param name="color">
+        /// The colour that the text should be.
+        /// </param>
         private void DrawStringWithSpriteFont(
             string       text,
             GLSpriteFont font,
-            Point        location
+            Point        location,
+            Color        color
         )
         {
+            // Acquire colour components
+            //
+            float alpha;
+            Color tint;
+
+            SplitFontTintAndAlpha(
+                color,
+                out tint,
+                out alpha
+            );
+            
+            // The actual text rendering
+            //
             string[]      lines    = text.Split('\n');
             char          prevChar = '\0';
             int           xCurrent = location.X;
@@ -564,7 +633,9 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                                 sprite.Size.Height * font.Scale
                             )
                         ),
-                        DrawMode.Stretch
+                        DrawMode.Stretch,
+                        tint,
+                        alpha
                     );
 
                     // Advance x-offset
@@ -624,6 +695,28 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             data.Add(rect.Height);
             
             return data;
+        }
+        
+        /// <summary>
+        /// Splits the tint and alpha components out from a colour for rendering text.
+        /// </summary>
+        /// <param name="color">
+        /// The intended font colour.
+        /// </param>
+        /// <param name="tint">
+        /// (Output) The tint component.
+        /// </param>
+        /// <param name="alpha">
+        /// (Output) The alpha component.
+        /// </param>
+        private void SplitFontTintAndAlpha(
+            Color     color,
+            out Color tint,
+            out float alpha
+        )
+        {
+            tint  = Color.FromArgb(255, color.R, color.G, color.B);
+            alpha = color.A / 255f;
         }
     }
 }

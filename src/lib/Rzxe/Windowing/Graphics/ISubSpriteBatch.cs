@@ -33,12 +33,17 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
         /// <param name="location">
         /// The location to draw the sprite.
         /// </param>
+        /// <param name="tint">
+        /// The colour to tint the sprite with, specify
+        /// <see cref="Color.Transparent"/> for no tinting.
+        /// </param>
         /// <param name="alpha">
         /// The opacity at which to draw the sprite.
         /// </param>
         void Draw(
             ISprite sprite,
             Point   location,
+            Color   tint,
             float   alpha = 1.0f
         );
         
@@ -51,12 +56,17 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
         /// <param name="location">
         /// The location to draw the region.
         /// </param>
+        /// <param name="tint">
+        /// The colour to tint the sprite with, specify
+        /// <see cref="Color.Transparent"/> for no tinting.
+        /// </param>
         /// <param name="alpha">
         /// The opacity at which to draw the sprite.
         /// </param>
         void Draw(
             Rectangle sourceRect,
             Point     location,
+            Color     tint,
             float     alpha = 1.0f
         );
         
@@ -73,6 +83,10 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
         /// <param name="drawMode">
         /// The mode that defines how the sprite should be drawn.
         /// </param>
+        /// <param name="tint">
+        /// The colour to tint the sprite with, specify
+        /// <see cref="Color.Transparent"/> for no tinting.
+        /// </param>
         /// <param name="alpha">
         /// The opacity at which to draw the sprite.
         /// </param>
@@ -80,6 +94,7 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
             ISprite   sprite,
             Rectangle destRect,
             DrawMode  drawMode,
+            Color     tint,
             float     alpha = 1.0f
         );
         
@@ -96,6 +111,10 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
         /// <param name="drawMode">
         /// The mode that defines how the region should be drawn.
         /// </param>
+        /// <param name="tint">
+        /// The colour to tint the sprite with, specify
+        /// <see cref="Color.Transparent"/> for no tinting.
+        /// </param>
         /// <param name="alpha">
         /// The opacity at which to draw the sprite.
         /// </param>
@@ -103,6 +122,7 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
             Rectangle sourceRect,
             Rectangle destRect,
             DrawMode  drawMode,
+            Color     tint,
             float     alpha = 1.0f
         );
         
@@ -115,12 +135,17 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
         /// <param name="destRect">
         /// The region to draw into.
         /// </param>
+        /// <param name="tint">
+        /// The colour to tint the sprite with, specify
+        /// <see cref="Color.Transparent"/> for no tinting.
+        /// </param>
         /// <param name="alpha">
         /// The opacity at which to draw the border box.
         /// </param>
         void DrawBorderBox(
             IBorderBoxResource borderBox,
             Rectangle          destRect,
+            Color              tint,
             float              alpha = 1.0f
         );
         
@@ -136,10 +161,14 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
         /// <param name="location">
         /// The location to draw the string.
         /// </param>
+        /// <param name="color">
+        /// The colour that the text should be.
+        /// </param>
         void DrawString(
             string text,
             IFont  font,
-            Point  location
+            Point  location,
+            Color  color
         );
     }
 }

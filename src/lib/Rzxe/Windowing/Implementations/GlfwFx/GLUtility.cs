@@ -182,6 +182,32 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         }
         
         /// <summary>
+        /// Creates an array of floating-point values from a colour.
+        /// </summary>
+        /// <param name="color">
+        /// The colour.
+        /// </param>
+        /// <returns>
+        /// An array of floating-point values forming the colour, ready for insertion
+        /// into a VBO.
+        /// </returns>
+        public static float[] MakeVboData(
+            Color color
+        )
+        {
+            // Expand the color to components
+            float[] components = new float[]
+            {
+                color.R / 255f,
+                color.G / 255f,
+                color.B / 255f,
+                color.A / 255f
+            };
+
+            return components;
+        }
+
+        /// <summary>
         /// Creates an array of floating-point values from a rectangle.
         /// </summary>
         /// <param name="rect">
