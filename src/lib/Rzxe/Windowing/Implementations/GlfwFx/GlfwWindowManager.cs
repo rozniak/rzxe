@@ -100,6 +100,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         /// <inheritdoc />
         public void Initialize()
         {
+            string title = RenderedGameEngine.Parameters.GameTitle;
+            
             CurrentInputState = new InputEvents();
             ResourceCache     = new GLResourceCache(RenderedGameEngine.Parameters);
 
@@ -118,8 +120,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                 Glfw.CreateWindow(
                     RenderedGameEngine.Parameters.DefaultClientWindowSize.Width,
                     RenderedGameEngine.Parameters.DefaultClientWindowSize.Height,
-                    "Junkbot (OpenGL 3.2)", // FIXME: Leftover - read from game engine
-                                            //        parameters
+                    $"{title} (OpenGL 3.2)",
                     GlfwMonitorPtr.Null,
                     GlfwWindowPtr.Null
                 );

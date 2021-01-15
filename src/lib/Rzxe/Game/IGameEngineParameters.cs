@@ -25,5 +25,10 @@ namespace Oddmatics.Rzxe.Game
         /// Gets the directory path for the game content root.
         /// </summary>
         string GameContentRoot { get; }
+        
+        /// <summary>
+        /// Gets the title of the game.
+        /// </summary>
+        string GameTitle { get; }
     }
 }
