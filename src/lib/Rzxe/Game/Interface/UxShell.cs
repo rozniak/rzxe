@@ -22,16 +22,14 @@ namespace Oddmatics.Rzxe.Game.Interface
     /// </summary>
     public class UxShell
     {
-        // TODO: Rethink how inputs are handled, use built in .NET types?
-        //
         /// <summary>
         /// The mouse button controls.
         /// </summary>
-        private static readonly string[] MouseButtons = new string[]
+        private static readonly ControlInput[] MouseButtons = new ControlInput[]
         {
-            "mb.left",
-            "mb.middle",
-            "mb.right"
+            ControlInput.MouseButtonLeft,
+            ControlInput.MouseButtonMiddle,
+            ControlInput.MouseButtonRight
         };
         
         
@@ -101,7 +99,7 @@ namespace Oddmatics.Rzxe.Game.Interface
                 //
                 for (byte i = 0; i < MouseButtons.Length; i++)
                 {
-                    var button = MouseButtons[i];
+                    ControlInput button = MouseButtons[i];
 
                     // Check - has button pressed state changed?
                     //
