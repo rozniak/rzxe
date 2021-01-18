@@ -290,16 +290,16 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             KeyModifiers  mods
         )
         {
-            string inputString = "vk." + key.ToString();
+            ControlInput input = GlfwInputMapping.GetMapping(key);
 
             switch (action)
             {
                 case KeyAction.Press:
-                    CurrentInputState.ReportPress(inputString);
+                    CurrentInputState.ReportPress(input);
                     break;
 
                 case KeyAction.Release:
-                    CurrentInputState.ReportRelease(inputString);
+                    CurrentInputState.ReportRelease(input);
                     break;
             }
         }
@@ -322,31 +322,16 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             KeyAction     action
         )
         {
-            string inputString = String.Empty;
-
-            switch (btn)
-            {
-                case MouseButton.LeftButton:
-                    inputString = "mb.left";
-                    break;
-
-                case MouseButton.MiddleButton:
-                    inputString = "mb.middle";
-                    break;
-
-                case MouseButton.RightButton:
-                    inputString = "mb.right";
-                    break;
-            }
+            ControlInput input = GlfwInputMapping.GetMapping(btn);
 
             switch (action)
             {
                 case KeyAction.Press:
-                    CurrentInputState.ReportPress(inputString);
+                    CurrentInputState.ReportPress(input);
                     break;
 
                 case KeyAction.Release:
-                    CurrentInputState.ReportRelease(inputString);
+                    CurrentInputState.ReportRelease(input);
                     break;
             }
         }

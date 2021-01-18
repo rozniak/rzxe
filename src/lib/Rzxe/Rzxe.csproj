@@ -96,6 +96,8 @@
     <Compile Include="Game\Animation\SpriteAnimationServer.cs" />
     <Compile Include="Game\Animation\SpriteAnimationSpriteData.cs" />
     <Compile Include="Game\Animation\SpriteAnimationStore.cs" />
+    <Compile Include="Input\ControlInput.cs" />
+    <Compile Include="Windowing\Implementations\GlfwFx\GlfwInputMapping.cs" />
   </ItemGroup>
   <ItemGroup>
     <ContentWithTargetPath Include="Windowing\Implementations\GlfwFx\Shaders\fragment.glsl">

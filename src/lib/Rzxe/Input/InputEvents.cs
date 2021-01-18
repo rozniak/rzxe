@@ -27,7 +27,7 @@ namespace Oddmatics.Rzxe.Input
         /// <summary>
         /// Gets the pressed inputs in the state.
         /// </summary>
-        public IList<string> DownedInputs { get; private set; }
+        public IList<ControlInput> DownedInputs { get; private set; }
         
         /// <summary>
         /// Gets a value indicating whether the state is read-only.
@@ -42,23 +42,23 @@ namespace Oddmatics.Rzxe.Input
         /// <summary>
         /// Gets the inputs that were pressed in the state.
         /// </summary>
-        public IList<string> NewPresses { get; private set; }
+        public IList<ControlInput> NewPresses { get; private set; }
         
         /// <summary>
         /// Gets the inputs that were released in the state.
         /// </summary>
-        public IList<string> NewReleases { get; private set; }
+        public IList<ControlInput> NewReleases { get; private set; }
 
         
         /// <summary>
         /// The actively pressed inputs.
         /// </summary>
-        private List<string> ActiveDownedInputs { get; set; }
+        private List<ControlInput> ActiveDownedInputs { get; set; }
         
         /// <summary>
         /// The previously pressed inputs.
         /// </summary>
-        private IList<string> LastDownedInputs { get; set; }
+        private IList<ControlInput> LastDownedInputs { get; set; }
 
         
         /// <summary>
@@ -66,14 +66,14 @@ namespace Oddmatics.Rzxe.Input
         /// </summary>
         public InputEvents()
         {
-            ActiveDownedInputs = new List<string>();
+            ActiveDownedInputs = new List<ControlInput>();
             ConsoleInput       = char.MinValue;
-            DownedInputs       = new List<string>().AsReadOnly();
+            DownedInputs       = new List<ControlInput>().AsReadOnly();
             IsReadOnly         = false;
             LastDownedInputs   = null;
             MousePosition      = PointF.Empty;
-            NewPresses         = new List<string>().AsReadOnly();
-            NewReleases        = new List<string>().AsReadOnly();
+            NewPresses         = new List<ControlInput>().AsReadOnly();
+            NewReleases        = new List<ControlInput>().AsReadOnly();
         }
         
         /// <summary>
@@ -87,11 +87,11 @@ namespace Oddmatics.Rzxe.Input
         /// The previous mouse position.
         /// </param>
         public InputEvents(
-            IList<string> lastDownedInputs,
+            IList<ControlInput> lastDownedInputs,
             PointF        lastMousePosition
         ) : this()
         {
-            ActiveDownedInputs = new List<string>(lastDownedInputs);
+            ActiveDownedInputs = new List<ControlInput>(lastDownedInputs);
             LastDownedInputs   = lastDownedInputs;
             MousePosition      = lastMousePosition;
         }
@@ -106,25 +106,25 @@ namespace Oddmatics.Rzxe.Input
 
             // Set up downed inputs
             //
-            DownedInputs = new List<string>(ActiveDownedInputs).AsReadOnly();
+            DownedInputs = new List<ControlInput>(ActiveDownedInputs).AsReadOnly();
 
             // Set up new presses
             //
-            IEnumerable<string> newPresses =
+            IEnumerable<ControlInput> newPresses =
                 LastDownedInputs == null ?
                     ActiveDownedInputs :
                     ActiveDownedInputs.Except(LastDownedInputs);
 
-            NewPresses = new List<string>(newPresses).AsReadOnly();
+            NewPresses = new List<ControlInput>(newPresses).AsReadOnly();
 
             // Set up new releases
             //
-            IEnumerable<string> newReleases =
+            IEnumerable<ControlInput> newReleases =
                 LastDownedInputs == null ?
-                    new List<string>() :
+                    new List<ControlInput>() :
                     LastDownedInputs.Except(ActiveDownedInputs);
 
-            NewReleases = new List<string>(newReleases).AsReadOnly();
+            NewReleases = new List<ControlInput>(newReleases).AsReadOnly();
             
             IsReadOnly = true;
         }
@@ -170,7 +170,7 @@ namespace Oddmatics.Rzxe.Input
         /// The input.
         /// </param>
         public void ReportPress(
-            string input
+            ControlInput input
         )
         {
             AssertNotReadOnly();
@@ -188,7 +188,7 @@ namespace Oddmatics.Rzxe.Input
         /// The input.
         /// </param>
         public void ReportRelease(
-            string input
+            ControlInput input
         )
         {
             AssertNotReadOnly();
