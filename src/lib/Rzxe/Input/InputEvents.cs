@@ -35,6 +35,11 @@ namespace Oddmatics.Rzxe.Input
         public bool IsReadOnly { get; private set; }
         
         /// <summary>
+        /// Gets the last position of the mouse.
+        /// </summary>
+        public PointF LastMousePosition { get; private set; }
+
+        /// <summary>
         /// Gets the mouse position in the state.
         /// </summary>
         public PointF MousePosition { get; private set; }
@@ -71,6 +76,7 @@ namespace Oddmatics.Rzxe.Input
             DownedInputs       = new List<ControlInput>().AsReadOnly();
             IsReadOnly         = false;
             LastDownedInputs   = null;
+            LastMousePosition  = PointF.Empty;
             MousePosition      = PointF.Empty;
             NewPresses         = new List<ControlInput>().AsReadOnly();
             NewReleases        = new List<ControlInput>().AsReadOnly();
@@ -80,20 +86,17 @@ namespace Oddmatics.Rzxe.Input
         /// Initializes a new instance of the <see cref="InputEvents"/> class with
         /// previous state data.
         /// </summary>
-        /// <param name="lastDownedInputs">
-        /// The previously pressed inputs.
-        /// </param>
-        /// <param name="lastMousePosition">
-        /// The previous mouse position.
+        /// <param name="prev">
+        /// The previous input state.
         /// </param>
         public InputEvents(
-            IList<ControlInput> lastDownedInputs,
-            PointF        lastMousePosition
+            InputEvents prev
         ) : this()
         {
-            ActiveDownedInputs = new List<ControlInput>(lastDownedInputs);
-            LastDownedInputs   = lastDownedInputs;
-            MousePosition      = lastMousePosition;
+            ActiveDownedInputs = new List<ControlInput>(prev.DownedInputs);
+            LastDownedInputs   = prev.DownedInputs;
+            LastMousePosition  = prev.MousePosition;
+            MousePosition      = prev.MousePosition;
         }
 
         

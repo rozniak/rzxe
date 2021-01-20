@@ -174,11 +174,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
 
             lastUpdate.FinalizeForReporting();
 
-            CurrentInputState =
-                new InputEvents(
-                    lastUpdate.DownedInputs,
-                    lastUpdate.MousePosition
-                );
+            CurrentInputState = new InputEvents(lastUpdate);
 
             return lastUpdate;
         }
