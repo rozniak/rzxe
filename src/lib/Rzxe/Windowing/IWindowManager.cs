@@ -8,6 +8,7 @@
  */
 
 using Oddmatics.Rzxe.Game;
+using Oddmatics.Rzxe.Game.Hosting;
 using Oddmatics.Rzxe.Input;
 using System;
 
@@ -19,10 +20,21 @@ namespace Oddmatics.Rzxe.Windowing
     public interface IWindowManager : IDisposable
     {
         /// <summary>
+        /// Gets the host interface that is used by the game for interacting with the
+        /// window manager.
+        /// </summary>
+        IHostedRenderer HostInterface { get; }
+
+        /// <summary>
         /// Gets a value indicating whether the window is open.
         /// </summary>
         bool IsOpen { get; }
         
+        /// <summary>
+        /// Gets the name of the window manager.
+        /// </summary>
+        string Name { get; }
+
         /// <summary>
         /// Gets a value indicating whether the window manager is ready.
         /// </summary>
@@ -31,13 +43,18 @@ namespace Oddmatics.Rzxe.Windowing
         /// <summary>
         /// Gets or sets the game engine that will be rendered.
         /// </summary>
-        IGameEngine RenderedGameEngine { get; set; }
+        IGameEngine RenderedGameEngine { get; }
         
         
         /// <summary>
         /// Initializes the window manager.
         /// </summary>
-        void Initialize();
+        /// <param name="game">
+        /// The game that will be rendered by the window manager.
+        /// </param>
+        void Initialize(
+            IGameEngine game
+        );
         
         /// <summary>
         /// Reads in the latest input events from the window manager.

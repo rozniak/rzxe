@@ -17,11 +17,6 @@ namespace Oddmatics.Rzxe.Game
     public interface IGameEngineParameters
     {
         /// <summary>
-        /// Gets the default size of the client window.
-        /// </summary>
-        Size DefaultClientWindowSize { get; }
-        
-        /// <summary>
         /// Gets the directory path for the game content root.
         /// </summary>
         string GameContentRoot { get; }
@@ -30,5 +25,16 @@ namespace Oddmatics.Rzxe.Game
         /// Gets the title of the game.
         /// </summary>
         string GameTitle { get; }
+        
+        /// <summary>
+        /// Gets the initial value that indicates that the viewport should be scaled
+        /// to the size of the window's client area.
+        /// </summary>
+        bool InitialViewportScalingOption { get; }
+        
+        /// <summary>
+        /// Gets the initial size of the viewport.
+        /// </summary>
+        Size InitialViewportSize { get; }
     }
 }

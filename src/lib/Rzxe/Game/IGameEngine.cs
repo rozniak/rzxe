@@ -7,6 +7,7 @@
  * Author(s): Rory Fewell <roryf@oddmatics.uk>
  */
 
+using Oddmatics.Rzxe.Game.Hosting;
 using Oddmatics.Rzxe.Input;
 using Oddmatics.Rzxe.Windowing.Graphics;
 using System;
@@ -32,7 +33,12 @@ namespace Oddmatics.Rzxe.Game
         /// <summary>
         /// Starts the game engine.
         /// </summary>
-        void Begin();
+        /// <param name="host">
+        /// The engine host instance.
+        /// </param>
+        void Begin(
+            IEngineHost host
+        );
         
         /// <summary>
         /// Renders the next frame.

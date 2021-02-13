@@ -49,7 +49,7 @@ namespace Oddmatics.Rzxe.Game
         );
         
         /// <summary>
-        /// Update the specified deltaTime and inputs.
+        /// Updates the game state with the latest inputs from the game engine.
         /// </summary>
         /// <param name="deltaTime">
         /// The time difference since the last update.
@@ -58,7 +58,7 @@ namespace Oddmatics.Rzxe.Game
         /// The latest state of inputs.
         /// </param>
         public abstract void Update(
-            TimeSpan deltaTime,
+            TimeSpan    deltaTime,
             InputEvents inputs
         );
     }

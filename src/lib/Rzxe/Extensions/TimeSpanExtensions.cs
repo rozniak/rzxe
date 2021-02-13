@@ -1,5 +1,5 @@
 ﻿/**
- * TimeSpanExtension.cs - TimeSpan Extension Methods
+ * TimeSpanExtensions.cs - TimeSpan Extension Methods
  *
  * This source-code is part of rzxe - an experimental game engine by Oddmatics:
  * <<https://www.oddmatics.uk>>

@@ -7,11 +7,13 @@
  * Author(s): Rory Fewell <roryf@oddmatics.uk>
  */
 
-using System;
 using Oddmatics.Rzxe.Game;
+using Oddmatics.Rzxe.Game.Hosting;
 using Oddmatics.Rzxe.Input;
 using Pencil.Gaming;
 using Pencil.Gaming.Graphics;
+using System;
+using System.Drawing;
 
 namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
 {
@@ -20,33 +22,97 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
     /// </summary>
     internal sealed class GlfwWindowManager : IWindowManager
     {
+        /// <summary>
+        /// Gets or sets the size of the client area.
+        /// </summary>
+        public Size ClientSize
+        {
+            get
+            {
+                Glfw.GetWindowSize(
+                    WindowPtr,
+                    out int width,
+                    out int height
+                );
+
+                return new Size(width, height);
+            }
+            set
+            {
+                Glfw.SetWindowSize(
+                    WindowPtr,
+                    value.Width,
+                    value.Height
+                );
+            }
+        }
+
+        /// <inheritdoc />
+        public IHostedRenderer HostInterface { get; private set; }
+
         /// <inheritdoc />
         public bool IsOpen { get; private set; }
         
         /// <inheritdoc />
+        public string Name
+        {
+            get { return "GLFW - OpenGL 3.2"; }
+        }
+
+        /// <inheritdoc />
         public bool Ready { get; private set; }
 
         /// <inheritdoc />
-        public IGameEngine RenderedGameEngine
+        public IGameEngine RenderedGameEngine { get; private set; }
+        
+        /// <summary>
+        /// Gets or sets the value that indicates whether to scale the viewport to the
+        /// entire client area.
+        /// </summary>
+        public bool ScaleViewport { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the size of the viewport - if <see cref="ScaleViewport"/> is
+        /// not set then this is always the size of the window's client area.
+        /// </summary>
+        public Size ViewportSize
         {
-            get { return _RenderedGameEngine; }
+            get
+            {
+                if (ScaleViewport)
+                {
+                    return _ViewportSize;
+                }
+
+                return ClientSize;
+            }
             set
             {
-                if (Locked)
-                {
-                    throw new InvalidOperationException(
-                        "Window manager state has been locked."
-                    );
-                }
-                else
-                {
-                    _RenderedGameEngine = value;
-                }
+                _ViewportSize = value;
             }
         }
-        private IGameEngine _RenderedGameEngine;
-        
-        
+        private Size _ViewportSize;
+
+        /// <summary>
+        /// Gets or sets the game window title.
+        /// </summary>
+        public string WindowTitle
+        {
+            get
+            {
+                return _WindowTitle;
+            }
+            set
+            {
+                string title = $"{value} {Name}";
+                
+                Glfw.SetWindowTitle(WindowPtr, title);
+                _WindowTitle = title;
+            }
+        }
+        private string _WindowTitle;
+
+
         /// <summary>
         /// The currrent input state.
         /// </summary>
@@ -64,7 +130,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
 
 
         #region GLFW Bits and Bobs
-        
+
         /// <summary>
         /// The OpenGL ID for the active VAO.
         /// </summary>
@@ -98,12 +164,14 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         }
         
         /// <inheritdoc />
-        public void Initialize()
+        public void Initialize(
+            IGameEngine game
+        )
         {
-            string title = RenderedGameEngine.Parameters.GameTitle;
-            
-            CurrentInputState = new InputEvents();
-            ResourceCache     = new GLResourceCache(RenderedGameEngine.Parameters);
+            CurrentInputState  = new InputEvents();
+            HostInterface      = new GlfwHostedRenderer(this);
+            RenderedGameEngine = game;
+            ResourceCache      = new GLResourceCache(RenderedGameEngine.Parameters);
 
             // Set up GLFW parameters and create the window
             //
@@ -116,11 +184,13 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             Glfw.WindowHint(WindowHint.OpenGLForwardCompat, 1);
             Glfw.WindowHint(WindowHint.OpenGLProfile, (int) OpenGLProfile.Core);
 
+            _WindowTitle = game.Parameters.GameTitle;
+            
             WindowPtr =
                 Glfw.CreateWindow(
-                    RenderedGameEngine.Parameters.DefaultClientWindowSize.Width,
-                    RenderedGameEngine.Parameters.DefaultClientWindowSize.Height,
-                    $"{title} (OpenGL 3.2)",
+                    RenderedGameEngine.Parameters.InitialViewportSize.Width,
+                    RenderedGameEngine.Parameters.InitialViewportSize.Height,
+                    $"{_WindowTitle} ({Name})",
                     GlfwMonitorPtr.Null,
                     GlfwWindowPtr.Null
                 );
@@ -148,11 +218,16 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
 
             // Set up viewport defaults
             //
+            _ViewportSize =
+                RenderedGameEngine.Parameters.InitialViewportSize;
+            ScaleViewport =
+                RenderedGameEngine.Parameters.InitialViewportScalingOption;
+            
             GL.Viewport(
                 0,
                 0,
-                RenderedGameEngine.Parameters.DefaultClientWindowSize.Width,
-                RenderedGameEngine.Parameters.DefaultClientWindowSize.Height
+                ViewportSize.Width,
+                ViewportSize.Height
             );
 
             // Set up input callbacks
@@ -191,7 +266,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             RenderedGameEngine.RenderFrame(
                 new GLGraphicsController(
                     ResourceCache,
-                    RenderedGameEngine.Parameters.DefaultClientWindowSize
+                    ViewportSize
                 )
             );
 

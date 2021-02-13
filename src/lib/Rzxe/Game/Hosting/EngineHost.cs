@@ -1,5 +1,5 @@
 ﻿/**
- * GameEntryPoint.cs - Game Entry Point
+ * IEngineHost.cs - rzxe Game Engine Host
  *
  * This source-code is part of rzxe - an experimental game engine by Oddmatics:
  * <<https://www.oddmatics.uk>>
@@ -7,7 +7,6 @@
  * Author(s): Rory Fewell <roryf@oddmatics.uk>
  */
 
-using Oddmatics.Rzxe.Game;
 using Oddmatics.Rzxe.Input;
 using Oddmatics.Rzxe.Windowing;
 using Oddmatics.Rzxe.Windowing.Implementations.GlfwFx;
@@ -15,45 +14,48 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 
-namespace Oddmatics.Rzxe
+namespace Oddmatics.Rzxe.Game.Hosting
 {
     /// <summary>
-    /// Represents the entry point for the game engine.
+    /// Provides the functionality for hosting a game engine in rzxe.
     /// </summary>
-    public sealed class GameEntryPoint
+    public class EngineHost : IEngineHost
     {
-        /// <summary>
-        /// Gets or sets the game engine to run.
-        /// </summary>
-        public IGameEngine GameEngine
+        /// <inheritdoc />
+        public IHostedRenderer Renderer
         {
-            get { return _GameEngine; }
-            set
-            {
-                if (Locked)
-                {
-                    throw new InvalidOperationException(
-                        "Game engine state has been locked."
-                    );
-                }
-                else
-                {
-                    _GameEngine = value;
-                }
-            }
+            get { return WindowManager.HostInterface; }
         }
-        private IGameEngine _GameEngine;
+
+
+        /// <summary>
+        /// The game engine that is being, or will be, hosted.
+        /// </summary>
+        private IGameEngine HostedGame { get; set; }
         
         /// <summary>
-        /// Gets a value indicating whether the game engine state has been locked.
+        /// The value that indicates whether the engine host has been initialized.
         /// </summary>
-        public bool Locked { get; private set; }
-        
-        
+        private bool Initialized { get; set; }
+
         /// <summary>
         /// The window manager.
         /// </summary>
         private IWindowManager WindowManager { get; set; }
+
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EngineHost"/> class.
+        /// </summary>
+        /// <param name="game">
+        /// The game engine that will be hosted.
+        /// </param>
+        public EngineHost(
+            IGameEngine game
+        )
+        {
+            HostedGame = game;
+        }
         
         
         /// <summary>
@@ -61,28 +63,20 @@ namespace Oddmatics.Rzxe
         /// </summary>
         public void Initialize()
         {
-            if (Locked)
+            if (Initialized)
             {
                 throw new InvalidOperationException(
-                    "Game engine state has been locked."
-                );
-            }
-
-            if (GameEngine == null)
-            {
-                throw new InvalidOperationException(
-                    "No game engine provided."
+                    "The engine host has already been initialized."
                 );
             }
 
             // FIXME: Replace this one day with a way of selecting the window manager
             //
-            WindowManager = new GlfwWindowManager()
-            {
-                RenderedGameEngine = GameEngine
-            };
-            
-            WindowManager.Initialize();
+            WindowManager = new GlfwWindowManager();
+
+            WindowManager.Initialize(HostedGame);
+
+            Initialized = true;
         }
         
         /// <summary>
@@ -90,16 +84,18 @@ namespace Oddmatics.Rzxe
         /// </summary>
         public void Run()
         {
-            if (WindowManager == null || !WindowManager.Ready)
+            if (!Initialized)
             {
-                throw new InvalidOperationException("No window manager initialized.");
+                throw new InvalidOperationException(
+                    "The engine host has not yet been initialized."
+                );
             }
 
             // Enter the main game loop
             //
             var gameTime = new Stopwatch();
-            
-            GameEngine.Begin();
+
+            HostedGame.Begin(this);
             
             while (WindowManager.IsOpen)
             {
@@ -108,7 +104,7 @@ namespace Oddmatics.Rzxe
                 gameTime.Start();
 
                 InputEvents inputs = WindowManager.ReadInputEvents();
-                GameEngine.Update(deltaTime, inputs);
+                HostedGame.Update(deltaTime, inputs);
 
                 WindowManager.RenderFrame();
 

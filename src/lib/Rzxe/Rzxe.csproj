@@ -47,7 +47,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GameEntryPoint.cs" />
     <Compile Include="Game\GameState.cs" />
     <Compile Include="Game\IGameEngine.cs" />
     <Compile Include="Game\IGameEngineParameters.cs" />
@@ -98,6 +97,13 @@
     <Compile Include="Game\Animation\SpriteAnimationStore.cs" />
     <Compile Include="Input\ControlInput.cs" />
     <Compile Include="Windowing\Implementations\GlfwFx\GlfwInputMapping.cs" />
+    <Compile Include="Game\Hosting\IEngineHost.cs" />
+    <Compile Include="Game\Hosting\IHostedRenderer.cs" />
+    <Compile Include="Game\Hosting\EngineHost.cs" />
+    <Compile Include="Windowing\Implementations\GlfwFx\GlfwHostedRenderer.cs" />
+    <Compile Include="Extensions\PointExtensions.cs" />
+    <Compile Include="Extensions\RectangleExtensions.cs" />
+    <Compile Include="Extensions\SizeExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ContentWithTargetPath Include="Windowing\Implementations\GlfwFx\Shaders\fragment.glsl">
@@ -122,6 +128,7 @@
     <Folder Include="Windowing\Graphics\Models\" />
     <Folder Include="Extensions\" />
     <Folder Include="Game\Animation\" />
+    <Folder Include="Game\Hosting\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
