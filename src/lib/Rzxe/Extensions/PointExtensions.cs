@@ -18,6 +18,52 @@ namespace Oddmatics.Rzxe.Extensions
     public static class PointExtensions
     {
         /// <summary>
+        /// Adds the specified offset to a <see cref="Point"/>.
+        /// </summary>
+        /// <param name="origin">
+        /// The <see cref="Point"/>.
+        /// </param>
+        /// <param name="delta">
+        /// The offset to add.
+        /// </param>
+        /// <returns>
+        /// The result of the operation on the <see cref="Point"/>.
+        /// </returns>
+        public static Point Add(
+            this Point origin,
+            int        delta
+        )
+        {
+            return new Point(
+                origin.X + delta,
+                origin.Y + delta
+            );
+        }
+        
+        /// <summary>
+        /// Adds the specified offset to a <see cref="PointF"/>.
+        /// </summary>
+        /// <param name="origin">
+        /// The <see cref="PointF"/>.
+        /// </param>
+        /// <param name="delta">
+        /// The offset to add.
+        /// </param>
+        /// <returns>
+        /// The result of the operation on the <see cref="PointF"/>.
+        /// </returns>
+        public static PointF Add(
+            this PointF origin,
+            float       delta
+        )
+        {
+            return new PointF(
+                origin.X + delta,
+                origin.Y + delta
+            );
+        }
+
+        /// <summary>
         /// Adds one <see cref="Point"/> to another.
         /// </summary>
         /// <param name="origin">
@@ -120,6 +166,52 @@ namespace Oddmatics.Rzxe.Extensions
 
             return p.Product(ratio);
         }
+        
+        /// <summary>
+        /// Multiplies the <see cref="Point"/> by a factor.
+        /// </summary>
+        /// <param name="origin">
+        /// The <see cref="Point"/>.
+        /// </param>
+        /// <param name="factor">
+        /// The factor to multiply by.
+        /// </param>
+        /// <returns>
+        /// The result of the operation on the <see cref="Point"/>.
+        /// </returns>
+        public static Point Product(
+            this Point origin,
+            int        factor
+        )
+        {
+            return new Point(
+                origin.X * factor,
+                origin.Y * factor
+            );
+        }
+        
+        /// <summary>
+        /// Multiplies the <see cref="PointF"/> by a factor.
+        /// </summary>
+        /// <param name="origin">
+        /// The <see cref="PointF"/>.
+        /// </param>
+        /// <param name="factor">
+        /// The factor to multiply by.
+        /// </param>
+        /// <returns>
+        /// The result of the operation on the <see cref="PointF"/>.
+        /// </returns>
+        public static PointF Product(
+            this PointF origin,
+            float       factor
+        )
+        {
+            return new PointF(
+                origin.X * factor,
+                origin.Y * factor
+            );
+        }
 
         /// <summary>
         /// Multiplies the <see cref="Point"/> by a factor.
@@ -167,6 +259,49 @@ namespace Oddmatics.Rzxe.Extensions
             );
         }
         
+        /// <summary>
+        /// Reduces (divides) the <see cref="Point"/> by a factor.
+        /// </summary>
+        /// <param name="origin">
+        /// The <see cref="Point"/>.
+        /// </param>
+        /// <param name="factor">
+        /// The factor to reduce by.
+        /// </param>
+        /// <returns>
+        /// The result of the operation on the <see cref="Point"/>.
+        /// </returns>
+        public static Point Reduce(
+            this Point origin,
+            int        factor
+        )
+        {
+            return origin.ToPointF().Reduce(factor).ToPoint();
+        }
+        
+        /// <summary>
+        /// Reduces (divides) the <see cref="PointF"/> by a factor.
+        /// </summary>
+        /// <param name="origin">
+        /// The <see cref="PointF"/>.
+        /// </param>
+        /// <param name="factor">
+        /// The factor to reduce by.
+        /// </param>
+        /// <returns>
+        /// The result of the operation on the <see cref="PointF"/>.
+        /// </returns>
+        public static PointF Reduce(
+            this PointF origin,
+            float       factor
+        )
+        {
+            return new PointF(
+                origin.X / factor,
+                origin.Y / factor
+            );
+        }
+
         /// <summary>
         /// Reduces (divides) the <see cref="Point"/> by a factor.
         /// </summary>
@@ -249,7 +384,7 @@ namespace Oddmatics.Rzxe.Extensions
         /// </returns>
         public static PointF Subtract(
             this PointF origin,
-            int         delta
+            float       delta
         )
         {
             return new PointF(

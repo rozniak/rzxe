@@ -29,6 +29,27 @@ namespace Oddmatics.Rzxe.Logic
         /// True if the point is inside the rectangle.
         /// </returns>
         public static bool PointInRect(
+            Point     point,
+            Rectangle rect
+        )
+        {
+            return point.X >= rect.Left && point.X <= rect.Right &&
+                   point.Y >= rect.Top  && point.Y <= rect.Bottom;
+        }
+
+        /// <summary>
+        /// Determines whether a point is inside a rectangle.
+        /// </summary>
+        /// <param name="point">
+        /// The point to investigate.
+        /// </param>
+        /// <param name="rect">
+        /// The rectangle that may contain the point (with inclusive bounds).
+        /// </param>
+        /// <returns>
+        /// True if the point is inside the rectangle.
+        /// </returns>
+        public static bool PointInRect(
             PointF     point,
             RectangleF rect
         )
