@@ -7,6 +7,7 @@
  * Author(s): Rory Fewell <roryf@oddmatics.uk>
  */
 
+using Oddmatics.Rzxe.Util;
 using System;
 using System.Drawing;
 
@@ -210,15 +211,20 @@ namespace Oddmatics.Rzxe.Extensions
         /// <param name="factor">
         /// The factor to reduce by.
         /// </param>
+        /// <param name="rounding">
+        /// Specification for how to round <paramref name="subject"/> if its values
+        /// are midway between two other numbers.
+        /// </param>
         /// <returns>
         /// The result of the operation on the <see cref="Size"/>.
         /// </returns>
         public static Size Reduce(
-            this Size subject,
-            int       factor
+            this Size      subject,
+            int            factor,
+            RoundingMethod rounding = RoundingMethod.ToNearest
         )
         {
-            return subject.ToSizeF().Reduce(factor).ToSize();
+            return subject.ToSizeF().Reduce(factor).ToSize(rounding);
         }
         
         /// <summary>
@@ -253,17 +259,22 @@ namespace Oddmatics.Rzxe.Extensions
         /// <param name="factor">
         /// The factor to reduce by.
         /// </param>
+        /// <param name="rounding">
+        /// Specification for how to round <paramref name="subject"/> if its values
+        /// are midway between two other numbers.
+        /// </param>
         /// <returns>
         /// The result of the operation on the <see cref="Size"/>.
         /// </returns>
         public static Size Reduce(
-            this Size subject,
-            Size      factor
+            this Size      subject,
+            Size           factor,
+            RoundingMethod rounding = RoundingMethod.ToNearest
         )
         {
             return subject.ToSizeF().Reduce(
                 factor.ToSizeF()
-            ).ToSize();
+            ).ToSize(rounding);
         }
         
         /// <summary>
@@ -383,17 +394,40 @@ namespace Oddmatics.Rzxe.Extensions
         /// <param name="s">
         /// The <see cref="SizeF"/> to convert.
         /// </param>
+        /// <param name="rounding">
+        /// Specification for how to round <paramref name="s"/> if its values are
+        /// midway between two other numbers.
+        /// </param>
         /// <returns>
         /// The <see cref="Size"/> that was converted.
         /// </returns>
         public static Size ToSize(
-            this SizeF s
+            this SizeF     s,
+            RoundingMethod rounding = RoundingMethod.ToNearest
         )
         {
-            return new Size(
-                (int) Math.Floor(s.Width),
-                (int) Math.Floor(s.Height)
-            );
+            double height = 0;
+            double width  = 0;
+            
+            switch (rounding)
+            {
+                case RoundingMethod.Ceiling:
+                    height = Math.Ceiling(s.Height);
+                    width  = Math.Ceiling(s.Width);
+                    break;
+
+                case RoundingMethod.Floor:
+                    height = Math.Floor(s.Height);
+                    width  = Math.Floor(s.Width);
+                    break;
+
+                case RoundingMethod.ToNearest:
+                    height = Math.Round(s.Height, 0, MidpointRounding.ToEven);
+                    width  = Math.Round(s.Width,  0, MidpointRounding.ToEven);
+                    break;
+            }
+
+            return new Size((int) width, (int) height);
         }
         
         /// <summary>

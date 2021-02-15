@@ -7,6 +7,7 @@
  * Author(s): Rory Fewell <roryf@oddmatics.uk>
  */
 
+using Oddmatics.Rzxe.Util;
 using System;
 using System.Drawing;
 
@@ -268,15 +269,20 @@ namespace Oddmatics.Rzxe.Extensions
         /// <param name="factor">
         /// The factor to reduce by.
         /// </param>
+        /// <param name="rounding">
+        /// Specification for how to round <paramref name="origin"/> if its values are
+        /// midway between two other numbers.
+        /// </param>
         /// <returns>
         /// The result of the operation on the <see cref="Point"/>.
         /// </returns>
         public static Point Reduce(
-            this Point origin,
-            int        factor
+            this Point     origin,
+            int            factor,
+            RoundingMethod rounding = RoundingMethod.ToNearest
         )
         {
-            return origin.ToPointF().Reduce(factor).ToPoint();
+            return origin.ToPointF().Reduce(factor).ToPoint(rounding);
         }
         
         /// <summary>
@@ -311,17 +317,22 @@ namespace Oddmatics.Rzxe.Extensions
         /// <param name="factor">
         /// The factor to reduce by.
         /// </param>
+        /// <param name="rounding">
+        /// Specification for how to round <paramref name="origin"/> if its values are
+        /// midway between two other numbers.
+        /// </param>
         /// <returns>
         /// The result of the operation on the <see cref="Point"/>.
         /// </returns>
         public static Point Reduce(
-            this Point origin,
-            Size       factor
+            this Point     origin,
+            Size           factor,
+            RoundingMethod rounding = RoundingMethod.ToNearest
         )
         {
             return origin.ToPointF().Reduce(
                 factor.ToSizeF()
-            ).ToPoint();
+            ).ToPoint(rounding);
         }
         
         /// <summary>
@@ -445,17 +456,40 @@ namespace Oddmatics.Rzxe.Extensions
         /// <param name="p">
         /// The <see cref="PointF"/> to convert.
         /// </param>
+        /// <param name="rounding">
+        /// Specification for how to round <paramref name="p"/> if its values are
+        /// midway between two other numbers.
+        /// </param>
         /// <returns>
         /// The <see cref="Point"/> that was converted.
         /// </returns>
         public static Point ToPoint(
-            this PointF p
+            this PointF    p,
+            RoundingMethod rounding = RoundingMethod.ToNearest
         )
         {
-            return new Point(
-                (int) Math.Floor(p.X),
-                (int) Math.Floor(p.Y)
-            );
+            double x = 0;
+            double y = 0;
+            
+            switch (rounding)
+            {
+                case RoundingMethod.Ceiling:
+                    x = Math.Ceiling(p.X);
+                    y = Math.Ceiling(p.Y);
+                    break;
+
+                case RoundingMethod.Floor:
+                    x = Math.Floor(p.X);
+                    y = Math.Floor(p.Y);
+                    break;
+
+                case RoundingMethod.ToNearest:
+                    x = Math.Round(p.X, 0, MidpointRounding.ToEven);
+                    y = Math.Round(p.Y, 0, MidpointRounding.ToEven);
+                    break;
+            }
+            
+            return new Point((int) x, (int) y);
         }
         
         /// <summary>

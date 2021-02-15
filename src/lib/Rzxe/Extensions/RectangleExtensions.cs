@@ -7,6 +7,7 @@
  * Author(s): Rory Fewell <roryf@oddmatics.uk>
  */
 
+using Oddmatics.Rzxe.Util;
 using System.Drawing;
 
 namespace Oddmatics.Rzxe.Extensions
@@ -117,15 +118,20 @@ namespace Oddmatics.Rzxe.Extensions
         /// <param name="factor">
         /// The factor to multiply by.
         /// </param>
+        /// <param name="rounding">
+        /// Specification for how to round <paramref name="rect"/> if its values are
+        /// midway between two other numbers.
+        /// </param>
         /// <returns>
         /// The result of the operation on the <see cref="Rectangle"/>.
         /// </returns>
         public static Rectangle Scale(
             this Rectangle rect,
-            float          factor
+            float          factor,
+            RoundingMethod rounding = RoundingMethod.ToNearest
         )
         {
-            return rect.ToRectangleF().Scale(factor).ToRectangle();
+            return rect.ToRectangleF().Scale(factor).ToRectangle(rounding);
         }
         
         /// <summary>
@@ -158,17 +164,22 @@ namespace Oddmatics.Rzxe.Extensions
         /// <param name="factor">
         /// The factor to multiply by.
         /// </param>
+        /// <param name="rounding">
+        /// Specification for how to round <paramref name="rect"/> if its values are
+        /// midway between two other numbers.
+        /// </param>
         /// <returns>
         /// The result of the operation on the <see cref="Rectangle"/>.
         /// </returns>
         public static Rectangle Scale(
             this Rectangle rect,
-            Size           factor
+            Size           factor,
+            RoundingMethod rounding = RoundingMethod.ToNearest
         )
         {
             return rect.ToRectangleF().Scale(
                 factor.ToSizeF()
-            ).ToRectangle();
+            ).ToRectangle(rounding);
         }
         
         /// <summary>
@@ -201,15 +212,20 @@ namespace Oddmatics.Rzxe.Extensions
         /// <param name="factor">
         /// The factor to multiply by.
         /// </param>
+        /// <param name="rounding">
+        /// Specification for how to round <paramref name="rect"/> if its values are
+        /// midway between two other numbers.
+        /// </param>
         /// <returns>
         /// The result of the operation on the <see cref="Rectangle"/>.
         /// </returns>
         public static Rectangle ScaleLocation(
             this Rectangle rect,
-            float          factor
+            float          factor,
+            RoundingMethod rounding = RoundingMethod.ToNearest
         )
         {
-            return rect.ToRectangleF().ScaleLocation(factor).ToRectangle();
+            return rect.ToRectangleF().ScaleLocation(factor).ToRectangle(rounding);
         }
         
         /// <summary>
@@ -290,15 +306,20 @@ namespace Oddmatics.Rzxe.Extensions
         /// <param name="factor">
         /// The factor to multiply by.
         /// </param>
+        /// <param name="rounding">
+        /// Specification for how to round <paramref name="rect"/> if its values are
+        /// midway between two other numbers.
+        /// </param>
         /// <returns>
         /// The result of the operation on the <see cref="Rectangle"/>.
         /// </returns>
         public static Rectangle ScaleSize(
             this Rectangle rect,
-            float          factor
+            float          factor,
+            RoundingMethod rounding = RoundingMethod.ToNearest
         )
         {
-            return rect.ToRectangleF().ScaleSize(factor).ToRectangle();
+            return rect.ToRectangleF().ScaleSize(factor).ToRectangle(rounding);
         }
         
         /// <summary>
@@ -514,16 +535,21 @@ namespace Oddmatics.Rzxe.Extensions
         /// <param name="r">
         /// The <see cref="RectangleF"/> to convert.
         /// </param>
+        /// <param name="rounding">
+        /// Specification for how to round <paramref name="r"/> if its values are
+        /// midway between two other numbers.
+        /// </param>
         /// <returns>
         /// The <see cref="Rectangle"/> that was converted.
         /// </returns>
         public static Rectangle ToRectangle(
-            this RectangleF r
+            this RectangleF r,
+            RoundingMethod  rounding = RoundingMethod.ToNearest
         )
         {
             return new Rectangle(
-                r.Location.ToPoint(),
-                r.Size.ToSize()
+                r.Location.ToPoint(rounding),
+                r.Size.ToSize(rounding)
             );
         }
         

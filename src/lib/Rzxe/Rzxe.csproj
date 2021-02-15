@@ -104,6 +104,7 @@
     <Compile Include="Extensions\PointExtensions.cs" />
     <Compile Include="Extensions\RectangleExtensions.cs" />
     <Compile Include="Extensions\SizeExtensions.cs" />
+    <Compile Include="Util\RoundingMethod.cs" />
   </ItemGroup>
   <ItemGroup>
     <ContentWithTargetPath Include="Windowing\Implementations\GlfwFx\Shaders\fragment.glsl">
