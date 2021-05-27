@@ -11,6 +11,7 @@ using Oddmatics.Rzxe.Input;
 using Oddmatics.Rzxe.Logic;
 using Oddmatics.Rzxe.Util.Collections;
 using Oddmatics.Rzxe.Windowing.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -20,7 +21,7 @@ namespace Oddmatics.Rzxe.Game.Interface
     /// <summary>
     /// Represents an in-game user interface shell.
     /// </summary>
-    public class UxShell
+    public sealed class UxShell : IDisposable
     {
         /// <summary>
         /// The mouse button controls.
@@ -50,7 +51,12 @@ namespace Oddmatics.Rzxe.Game.Interface
         /// </summary>
         private UxComponent HoveredComponent { get; set; }
         
-        
+        /// <summary>
+        /// The sprite batch for rendering the shell.
+        /// </summary>
+        private ISpriteBatch SpriteBatch { get; set; }
+
+
         /// <summary>
         /// Initializes a new instance of the <see cref="UxShell"/> class.
         /// </summary>
@@ -65,6 +71,15 @@ namespace Oddmatics.Rzxe.Game.Interface
         }
         
         
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            if (SpriteBatch != null)
+            {
+                SpriteBatch.Dispose();
+            }
+        }
+
         /// <summary>
         /// Handles a mouse input update for the shell.
         /// </summary>
@@ -152,18 +167,27 @@ namespace Oddmatics.Rzxe.Game.Interface
             IGraphicsController graphics
         )
         {
+            if (SpriteBatch == null)
+            {
+                ISpriteAtlas atlas = graphics.GetSpriteAtlas("shell");
+                
+                SpriteBatch =
+                    graphics.CreateSpriteBatch(
+                        atlas,
+                        SpriteBatchUsageHint.Dynamic
+                    );
+            }
+            
             // Render controls back-to-front
             //
-            ISpriteAtlas atlas    = graphics.GetSpriteAtlas("shell");
-            var          safeList = new List<UxComponent>(Components);
-            ISpriteBatch sb       = graphics.CreateSpriteBatch(atlas);
+            var safeList = new List<UxComponent>(Components);
 
             foreach (UxComponent component in safeList)
             {
-                component.Render(sb);
+                component.Render(SpriteBatch);
             }
-            
-            sb.Finish();
+
+            SpriteBatch.Finish();
         }
         
         

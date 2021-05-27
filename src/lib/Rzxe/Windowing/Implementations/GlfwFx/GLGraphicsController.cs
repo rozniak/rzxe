@@ -65,19 +65,43 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         
         /// <inheritdoc />
         public ISpriteBatch CreateSpriteBatch(
-            ISpriteAtlas atlas
+            ISpriteAtlas         atlas,
+            SpriteBatchUsageHint usage
         )
         {
             if (!(atlas is GLSpriteAtlas))
             {
                 throw new ArgumentException("Invalid atlas.");
             }
+            
+            switch (usage)
+            {
+                case SpriteBatchUsageHint.Dynamic:
+                    return new GLDynamicSpriteBatch(
+                        this,
+                        (GLSpriteAtlas) atlas,
+                        ResourceCache
+                    );
+                    
+                case SpriteBatchUsageHint.Static:
+                    return new GLStaticSpriteBatch(
+                        this,
+                        (GLSpriteAtlas) atlas,
+                        ResourceCache
+                    );
+                    
+                case SpriteBatchUsageHint.Stream:
+                    return new GLStreamSpriteBatch(
+                        this,
+                        (GLSpriteAtlas) atlas,
+                        ResourceCache
+                    );
 
-            return new GLSpriteBatch(
-                this,
-                (GLSpriteAtlas) atlas,
-                ResourceCache
-            );
+                default:
+                    throw new NotSupportedException(
+                        "Unsupported sprite batch usage hint."
+                    );
+            }
         }
         
         /// <inheritdoc />

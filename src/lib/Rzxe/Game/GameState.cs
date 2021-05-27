@@ -16,7 +16,7 @@ namespace Oddmatics.Rzxe.Game
     /// <summary>
     /// Represents a state for the game.
     /// </summary>
-    public abstract class GameState : IEquatable<GameState>
+    public abstract class GameState : IDisposable, IEquatable<GameState>
     {
         /// <summary>
         /// Gets the focal mode for the state.
@@ -30,13 +30,15 @@ namespace Oddmatics.Rzxe.Game
         
         
         /// <inheritdoc />
+        public virtual void Dispose() { }
+
+        /// <inheritdoc />
         public bool Equals(
             GameState other
         )
         {
             return Name == other.Name;
         }
-        
         
         /// <summary>
         /// Renders the game state.

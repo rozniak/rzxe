@@ -38,11 +38,15 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
         /// <param name="atlas">
         /// The sprite atlas to use.
         /// </param>
+        /// <param name="usage">
+        /// The usage hint that describes the I/O properties for the sprite batch.
+        /// </param>
         /// <returns>
         /// The new sprite batch instance.
         /// </returns>
         ISpriteBatch CreateSpriteBatch(
-            ISpriteAtlas atlas
+            ISpriteAtlas         atlas,
+            SpriteBatchUsageHint usage
         );
         
         /// <summary>

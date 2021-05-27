@@ -8,6 +8,7 @@
  */
 
 using Oddmatics.Rzxe.Windowing.Graphics;
+using System;
 using System.Drawing;
 
 namespace Oddmatics.Rzxe.Game.Interface
@@ -15,7 +16,7 @@ namespace Oddmatics.Rzxe.Game.Interface
     /// <summary>
     /// Represents an in-game user interface component.
     /// </summary>
-    public abstract class UxComponent
+    public abstract class UxComponent : IDisposable
     {
         /// <summary>
         /// Gets the bounds of the component.
@@ -60,6 +61,13 @@ namespace Oddmatics.Rzxe.Game.Interface
         
         
         /// <summary>
+        /// The value that indicates whether the component has been disposed or is
+        /// currently being disposed.
+        /// </summary>
+        protected bool Disposing { get; set; }
+
+
+        /// <summary>
         /// Handles a mouse click on the component..
         /// </summary>
         public virtual void OnClick() { }
@@ -84,6 +92,10 @@ namespace Oddmatics.Rzxe.Game.Interface
         /// </summary>
         public virtual void OnMouseUp() { }
         
+        
+        /// <inheritdoc />
+        public abstract void Dispose();
+        
         /// <summary>
         /// Renders the component.
         /// </summary>
@@ -93,5 +105,17 @@ namespace Oddmatics.Rzxe.Game.Interface
         public virtual void Render(
             ISpriteBatch sb
         ) { }
+        
+        
+        /// <summary>
+        /// Asserts that the component is not disposed.
+        /// </summary>
+        protected void AssertNotDisposed()
+        {
+            if (Disposing)
+            {
+                throw new ObjectDisposedException(Name);
+            }
+        }
     }
 }

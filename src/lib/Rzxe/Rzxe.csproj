@@ -63,7 +63,6 @@
     <Compile Include="Windowing\Implementations\GlfwFx\GLGraphicsController.cs" />
     <Compile Include="Windowing\Implementations\GlfwFx\GLResourceCache.cs" />
     <Compile Include="Windowing\Implementations\GlfwFx\GLSpriteAtlas.cs" />
-    <Compile Include="Windowing\Implementations\GlfwFx\GLSpriteBatch.cs" />
     <Compile Include="Windowing\Implementations\GlfwFx\GlfwWindowManager.cs" />
     <Compile Include="Windowing\Implementations\GlfwFx\GLUtility.cs" />
     <Compile Include="Windowing\IWindowManager.cs" />
@@ -83,8 +82,6 @@
     <Compile Include="Windowing\Implementations\GlfwFx\GLSpriteFont.cs" />
     <Compile Include="Windowing\Graphics\StringMetrics.cs" />
     <Compile Include="Windowing\Graphics\SingleLineStringMetrics.cs" />
-    <Compile Include="Windowing\Graphics\ISubSpriteBatch.cs" />
-    <Compile Include="Windowing\Implementations\GlfwFx\GLSubSpriteBatch.cs" />
     <Compile Include="Windowing\Graphics\EdgeMetrics.cs" />
     <Compile Include="Extensions\TimeSpanExtensions.cs" />
     <Compile Include="Game\Animation\Models\SpriteAnimationFrameModel.cs" />
@@ -105,6 +102,26 @@
     <Compile Include="Extensions\RectangleExtensions.cs" />
     <Compile Include="Extensions\SizeExtensions.cs" />
     <Compile Include="Util\RoundingMethod.cs" />
+    <Compile Include="Windowing\Graphics\IDrawInstruction.cs" />
+    <Compile Include="Windowing\Graphics\ISpriteDrawInstruction.cs" />
+    <Compile Include="Util\ICachedObject.cs" />
+    <Compile Include="Windowing\Graphics\IBorderBoxDrawInstruction.cs" />
+    <Compile Include="Windowing\Graphics\IStringDrawInstruction.cs" />
+    <Compile Include="Windowing\Graphics\IBlitDrawInstruction.cs" />
+    <Compile Include="Windowing\Implementations\GlfwFx\GLDrawInstructionsList.cs" />
+    <Compile Include="Windowing\Implementations\GlfwFx\GLDrawInstruction.cs" />
+    <Compile Include="Windowing\Implementations\GlfwFx\GLBlitDrawInstruction.cs" />
+    <Compile Include="Windowing\Implementations\GlfwFx\GLBorderBoxDrawInstruction.cs" />
+    <Compile Include="Windowing\Implementations\GlfwFx\GLVboData.cs" />
+    <Compile Include="Windowing\Graphics\SpriteBatchUsageHint.cs" />
+    <Compile Include="Windowing\Implementations\GlfwFx\GLSpriteBatchBase.cs" />
+    <Compile Include="Windowing\Implementations\GlfwFx\GLSpriteDrawInstruction.cs" />
+    <Compile Include="Windowing\Implementations\GlfwFx\GLStringDrawInstruction.cs" />
+    <Compile Include="Windowing\Implementations\GlfwFx\GLStreamSpriteBatch.cs" />
+    <Compile Include="Windowing\Implementations\GlfwFx\GLDrawInstructionsChangedEvent.cs" />
+    <Compile Include="Windowing\Implementations\GlfwFx\GLDrawInstructionChange.cs" />
+    <Compile Include="Windowing\Implementations\GlfwFx\GLDynamicSpriteBatch.cs" />
+    <Compile Include="Windowing\Implementations\GlfwFx\GLStaticSpriteBatch.cs" />
   </ItemGroup>
   <ItemGroup>
     <ContentWithTargetPath Include="Windowing\Implementations\GlfwFx\Shaders\fragment.glsl">

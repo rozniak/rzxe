@@ -110,6 +110,81 @@ namespace Oddmatics.Rzxe.Extensions
         }
         
         /// <summary>
+        /// Clips one <see cref="Rectangle"/> inside another.
+        /// </summary>
+        /// <param name="srcRect">
+        /// The source <see cref="Rectangle"/>.
+        /// </param>
+        /// <param name="boundRect">
+        /// The <see cref="Rectangle"/> that will clip the source.
+        /// </param>
+        /// <returns>
+        /// The clipped <see cref="Rectangle"/> within the boundaries.
+        /// </returns>
+        public static Rectangle ClipInside(
+            this Rectangle srcRect,
+            Rectangle      boundRect
+        )
+        {
+            int clipBottom = ClipValue(
+                                 srcRect.Bottom,
+                                 boundRect.Bottom,
+                                 false
+                             );
+            int clipLeft   = ClipValue(
+                                 srcRect.Left,
+                                 boundRect.Left,
+                                 true
+                             );
+            int clipRight  = ClipValue(
+                                 srcRect.Right,
+                                 boundRect.Right,
+                                 false
+                             );
+            int clipTop    = ClipValue(
+                                 srcRect.Top,
+                                 boundRect.Top,
+                                 true
+                             );
+
+            return new Rectangle(
+                clipLeft,
+                clipTop,
+                clipRight - clipLeft,
+                clipBottom - clipTop
+            );
+        }
+        
+        /// <summary>
+        /// Determines whether another rectangle is contained within the rectangle.
+        /// </summary>
+        /// <param name="rect">
+        /// The <see cref="Rectangle"/>.
+        /// </param>
+        /// <param name="child">
+        /// The <see cref="Rectangle"/> to determine whether is entirely contained
+        /// within <paramref name="rect"/>.
+        /// </param>
+        /// <returns>
+        /// True if the rectangle is entirely contained.
+        /// </returns>
+        public static bool Contains(
+            this Rectangle rect,
+            Rectangle      child
+        )
+        {
+            if (
+                child.Left < rect.Left || child.Right  > rect.Right ||
+                child.Top  < rect.Top  || child.Bottom > rect.Bottom
+            )
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Scales the <see cref="Rectangle"/> by a factor.
         /// </summary>
         /// <param name="rect">
@@ -388,52 +463,6 @@ namespace Oddmatics.Rzxe.Extensions
             return new RectangleF(
                 rect.Location,
                 rect.Size.Product(factor)
-            );
-        }
-
-        /// <summary>
-        /// Clips one <see cref="Rectangle"/> inside another.
-        /// </summary>
-        /// <param name="srcRect">
-        /// The source <see cref="Rectangle"/>.
-        /// </param>
-        /// <param name="boundRect">
-        /// The <see cref="Rectangle"/> that will clip the source.
-        /// </param>
-        /// <returns>
-        /// The clipped <see cref="Rectangle"/> within the boundaries.
-        /// </returns>
-        public static Rectangle ClipInside(
-            this Rectangle srcRect,
-            Rectangle      boundRect
-        )
-        {
-            int clipBottom = ClipValue(
-                                 srcRect.Bottom,
-                                 boundRect.Bottom,
-                                 false
-                             );
-            int clipLeft   = ClipValue(
-                                 srcRect.Left,
-                                 boundRect.Left,
-                                 true
-                             );
-            int clipRight  = ClipValue(
-                                 srcRect.Right,
-                                 boundRect.Right,
-                                 false
-                             );
-            int clipTop    = ClipValue(
-                                 srcRect.Top,
-                                 boundRect.Top,
-                                 true
-                             );
-
-            return new Rectangle(
-                clipLeft,
-                clipTop,
-                clipRight - clipLeft,
-                clipBottom - clipTop
             );
         }
 

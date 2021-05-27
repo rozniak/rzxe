@@ -7,6 +7,8 @@
  * Author(s): Rory Fewell <roryf@oddmatics.uk>
  */
 
+using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace Oddmatics.Rzxe.Windowing.Graphics
@@ -14,21 +16,23 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
     /// <summary>
     /// Represents a sprite batch for drawing sprites en-masse.
     /// </summary>
-    public interface ISpriteBatch
+    public interface ISpriteBatch : ICloneable, IDisposable
     {
         /// <summary>
         /// Gets the atlas in use.
         /// </summary>
         ISpriteAtlas Atlas { get; }
         
-        
         /// <summary>
-        /// Creates a sub-batch that can be drawn into an executed later.
+        /// Gets the instructions to be executed in the sprite batch.
         /// </summary>
-        /// <returns>
-        /// The newly created sub-batch instance.
-        /// </returns>
-        ISubSpriteBatch CreateSubBatch();
+        IList<IDrawInstruction> Instructions { get; }
+
+        /// <summary>
+        /// Gets the usage hint that describes I/O properties for the sprite batch.
+        /// </summary>
+        SpriteBatchUsageHint Usage { get; }
+        
         
         /// <summary>
         /// Draws a sprite at the specified location.
@@ -46,7 +50,10 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
         /// <param name="alpha">
         /// The opacity at which to draw the sprite.
         /// </param>
-        void Draw(
+        /// <returns>
+        /// The drawing instruction that was generated.
+        /// </returns>
+        ISpriteDrawInstruction Draw(
             ISprite sprite,
             Point   location,
             Color   tint,
@@ -69,7 +76,10 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
         /// <param name="alpha">
         /// The opacity at which to draw the sprite.
         /// </param>
-        void Draw(
+        /// <returns>
+        /// The drawing instruction that was generated.
+        /// </returns>
+        ISpriteDrawInstruction Draw(
             Rectangle sourceRect,
             Point     location,
             Color     tint,
@@ -96,7 +106,10 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
         /// <param name="alpha">
         /// The opacity at which to draw the sprite.
         /// </param>
-        void Draw(
+        /// <returns>
+        /// The drawing instruction that was generated.
+        /// </returns>
+        ISpriteDrawInstruction Draw(
             ISprite   sprite,
             Rectangle destRect,
             DrawMode  drawMode,
@@ -124,7 +137,10 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
         /// <param name="alpha">
         /// The opacity at which to draw the sprite.
         /// </param>
-        void Draw(
+        /// <returns>
+        /// The drawing instruction that was generated.
+        /// </returns>
+        ISpriteDrawInstruction Draw(
             Rectangle sourceRect,
             Rectangle destRect,
             DrawMode  drawMode,
@@ -148,7 +164,10 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
         /// <param name="alpha">
         /// The opacity at which to draw the border box.
         /// </param>
-        void DrawBorderBox(
+        /// <returns>
+        /// The drawing instruction that was generated.
+        /// </returns>
+        IBorderBoxDrawInstruction DrawBorderBox(
             IBorderBoxResource borderBox,
             Rectangle          destRect,
             Color              tint,
@@ -170,21 +189,14 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
         /// <param name="color">
         /// The colour that the text should be.
         /// </param>
-        void DrawString(
+        /// <returns>
+        /// The drawing instruction that was generated.
+        /// </returns>
+        IStringDrawInstruction DrawString(
             string text,
             IFont  font,
             Point  location,
             Color  color
-        );
-        
-        /// <summary>
-        /// Draws a sub-batch.
-        /// </summary>
-        /// <param name="subBatch">
-        /// The sub-batch.
-        /// </param>
-        void DrawSubBatch(
-            ISubSpriteBatch subBatch
         );
         
         /// <summary>

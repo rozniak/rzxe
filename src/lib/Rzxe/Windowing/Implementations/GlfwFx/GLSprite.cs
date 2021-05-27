@@ -44,7 +44,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         )
         {
             Bounds = model.Bounds;
-            Name   = model.Name;
+            Name   = model.Name.ToLower();
         }
     }
 }
