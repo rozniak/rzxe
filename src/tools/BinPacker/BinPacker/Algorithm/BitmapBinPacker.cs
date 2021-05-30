@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 
 namespace Oddmatics.Rzxe.Tools.BinPacker.Algorithm
 {
@@ -26,6 +27,16 @@ namespace Oddmatics.Rzxe.Tools.BinPacker.Algorithm
         /// </summary>
         private static string[] AcceptedImageFormats = { "*.bmp", "*.png" };
         
+        /// <summary>
+        /// The filename for the border box definitions JSON document.
+        /// </summary>
+        private const string BorderBoxDefinitionsFilename = "borderboxes.json";
+        
+        /// <summary>
+        /// The filename for the font definitions JSON document.
+        /// </summary>
+        private const string FontDefinitionsFilename = "fonts.json";
+        
         
         /// <summary>
         /// The bitmap atlas.
@@ -36,6 +47,16 @@ namespace Oddmatics.Rzxe.Tools.BinPacker.Algorithm
         /// The intended size of the atlas.
         /// </summary>
         private Size AtlasSize { get; set; }
+        
+        /// <summary>
+        /// The defined border boxes in the atlas.
+        /// </summary>
+        private IList<BorderBoxModel> BorderBoxDefinitions { get; set; }
+
+        /// <summary>
+        /// The defined fonts in the atlas.
+        /// </summary>
+        private IList<FontModel> FontDefinitions { get; set; }
 
         /// <summary>
         /// The root node of bin packing.
@@ -68,6 +89,9 @@ namespace Oddmatics.Rzxe.Tools.BinPacker.Algorithm
         )
         {
             IList<LoadedBitmap> sprites = GetSprites(spriteRoot);
+
+            BorderBoxDefinitions = GetBorderBoxDefinitions(spriteRoot);
+            FontDefinitions      = GetFontDefinitions(spriteRoot);
             
             // Bin off existing state, if any
             //
@@ -104,7 +128,47 @@ namespace Oddmatics.Rzxe.Tools.BinPacker.Algorithm
                     }
                     
                     g.DrawImage(sprite.Bitmap, node.Bounds);
-                    node.LeafName = sprite.Name;
+
+                    // We interject here - the sprite MIGHT be something special such
+                    // as a font character, in which case we may need special
+                    // handling for the name
+                    //
+                    string fontNamePrefix =
+                        FindIfSpriteBelongsToFont(
+                            sprite,
+                            FontDefinitions
+                        );
+                        
+                    if (fontNamePrefix != null)
+                    {
+                        string charName = sprite.Name.Substring(fontNamePrefix.Length);
+                        
+                        switch (charName)
+                        {
+                            case "apostrophe": charName =  "'"; break;
+                            case "backslash":  charName = @"\"; break;
+                            case "backtick":   charName =  "`"; break;
+                            case "bang":       charName =  "!"; break;
+                            case "bracel":     charName =  "{"; break;
+                            case "bracer":     charName =  "}"; break;
+                            case "bracketl":   charName =  "("; break;
+                            case "bracketr":   charName =  ")"; break;
+                            case "caret":      charName =  "^"; break;
+                            case "colon":      charName =  ":"; break;
+                            case "comma":      charName =  ","; break;
+                            case "fullstop":   charName =  "."; break;
+                            case "pipe":       charName =  "|"; break;
+                            case "question":   charName =  "?"; break;
+                            case "semicolon":  charName =  ";"; break;
+                            case "tilde":      charName =  "~"; break;
+                        }
+
+                        node.LeafName = fontNamePrefix + charName;
+                    }
+                    else
+                    {
+                        node.LeafName = sprite.Name;
+                    }
                     
                     sprite.Dispose();
                 }
@@ -130,6 +194,9 @@ namespace Oddmatics.Rzxe.Tools.BinPacker.Algorithm
             var atlasModel = new AtlasModel();
 
             BuildAtlasModel(RootNode, ref atlasModel);
+
+            atlasModel.BorderBoxes.AddRange(BorderBoxDefinitions);
+            atlasModel.Fonts.AddRange(FontDefinitions);
 
             // Now save
             //
@@ -185,6 +252,41 @@ namespace Oddmatics.Rzxe.Tools.BinPacker.Algorithm
                 );
             }
         }
+        
+        /// <summary>
+        /// Finds if the specified sprite is part of a font's character set.
+        /// </summary>
+        /// <param name="sprite">
+        /// The sprite.
+        /// </param>
+        /// <param name="fonts">
+        /// The collection of font definitions.
+        /// </param>
+        /// <returns>
+        /// The sprite name prefix used by the font, if determined to be part of a
+        /// font, otherwise null.
+        /// </returns>
+        private string FindIfSpriteBelongsToFont(
+            LoadedBitmap     sprite,
+            IList<FontModel> fonts
+        )
+        {
+            FontModel font =
+                fonts.FirstOrDefault(
+                    (f) =>
+                        sprite.Name.StartsWith(
+                            f.SpriteNameBase,
+                            StringComparison.InvariantCultureIgnoreCase
+                        )
+                );
+                
+            if (font == null)
+            {
+                return null;
+            }
+
+            return font.SpriteNameBase;
+        }
 
         /// <summary>
         /// Gets sprites from the specified directory.
@@ -212,6 +314,56 @@ namespace Oddmatics.Rzxe.Tools.BinPacker.Algorithm
             }
 
             return sprites.AsReadOnly();
+        }
+        
+        /// <summary>
+        /// Gets font definitions from the specified directory.
+        /// </summary>
+        /// <param name="spriteRoot">
+        /// The root directory containing the definition file.
+        /// </param>
+        /// <returns>
+        /// The list of definitions.
+        /// </returns>
+        private IList<FontModel> GetFontDefinitions(
+            string spriteRoot
+        )
+        {
+            string path = Path.Combine(spriteRoot, FontDefinitionsFilename);
+            
+            if (!File.Exists(path))
+            {
+                return new List<FontModel>().AsReadOnly();
+            }
+
+            return JsonConvert.DeserializeObject<List<FontModel>>(
+                File.ReadAllText(path)
+            ).AsReadOnly();
+        }
+        
+        /// <summary>
+        /// Gets border box definitions from the specified directory.
+        /// </summary>
+        /// <param name="spriteRoot">
+        /// The root directory containing the definition file.
+        /// </param>
+        /// <returns>
+        /// The list of definitions.
+        /// </returns>
+        private IList<BorderBoxModel> GetBorderBoxDefinitions(
+            string spriteRoot
+        )
+        {
+            string path = Path.Combine(spriteRoot, BorderBoxDefinitionsFilename);
+            
+            if (!File.Exists(path))
+            {
+                return new List<BorderBoxModel>().AsReadOnly();
+            }
+
+            return JsonConvert.DeserializeObject<List<BorderBoxModel>>(
+                File.ReadAllText(path)
+            ).AsReadOnly();
         }
     }
 }
