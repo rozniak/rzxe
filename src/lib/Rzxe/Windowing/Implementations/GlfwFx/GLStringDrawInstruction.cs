@@ -10,6 +10,7 @@
 using Oddmatics.Rzxe.Windowing.Graphics;
 using System;
 using System.Drawing;
+using System.Text.RegularExpressions;
 
 namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
 {
@@ -51,6 +52,27 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             }
         }
         private string _Text;
+        
+        
+        /// <inheritdoc />
+        protected override int BufferSizeRequired
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(Text))
+                {
+                    return 0;
+                }
+                else
+                {
+                    // Sprites exist only for non-whitespace in the text
+                    //
+                    var regex = new Regex(@"\S");
+
+                    return 6 * regex.Matches(Text).Count;
+                }
+            }
+        }
 
 
         /// <summary>

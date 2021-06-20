@@ -21,6 +21,11 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         Added,
         
         /// <summary>
+        /// An instruction has changed immensely in the list.
+        /// </summary>
+        BigChange,
+        
+        /// <summary>
         /// An instruction has been changed in the list.
         /// </summary>
         Changed,

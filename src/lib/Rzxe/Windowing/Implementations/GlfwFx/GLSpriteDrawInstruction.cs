@@ -79,8 +79,12 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             }
         }
         private ISprite _Sprite;
-
-
+        
+        
+        /// <inheritdoc />
+        protected override int BufferSizeRequired { get { return 6; } }
+        
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="GLSpriteDrawInstruction"/>
         /// class.

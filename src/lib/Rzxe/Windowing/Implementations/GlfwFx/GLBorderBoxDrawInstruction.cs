@@ -31,6 +31,15 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         private IBorderBoxResource _BorderBox;
         
         
+        /// <inheritdoc />
+        protected override int BufferSizeRequired
+        {
+            // 9 sprites make up the box (6 vertices per sprite * 9 sprites)
+            //
+            get { return 42; }
+        }
+        
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="GLBorderBoxDrawInstruction"/>
         /// class.

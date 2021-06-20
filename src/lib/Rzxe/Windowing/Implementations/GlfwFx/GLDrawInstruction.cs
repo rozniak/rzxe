@@ -10,7 +10,6 @@
 using Oddmatics.Rzxe.Util;
 using Oddmatics.Rzxe.Windowing.Graphics;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 
 namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
@@ -40,10 +39,17 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         private Point _Location;
         
         
-        
-        
+        /// <summary>
+        /// Gets the buffer size required by the draw instruction (number of vertices).
+        /// </summary>
+        protected abstract int BufferSizeRequired { get; }
+
+
         /// <inheritdoc />
         public event EventHandler Invalidated;
+        
+        /// <inheritdoc />
+        public event EventHandler InvalidatedBig;
         
         
         /// <summary>
@@ -71,15 +77,28 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         /// The composed buffer data for the drawing instruction.
         /// </returns>
         public abstract GLVboData Compose();
-        
+
 
         /// <summary>
         /// Raises a notification that any cache for the draw instruction should be
         /// invalidated.
         /// </summary>
-        protected void Invalidate()
+        /// <param name="bigChange">
+        /// If the draw instruction has changed significantly (for instance, the buffer
+        /// size required has changed).
+        /// </param>
+        protected void Invalidate(
+            bool bigChange = false
+        )
         {
-            Invalidated?.Invoke(this, EventArgs.Empty);
+            if (bigChange)
+            {
+                InvalidatedBig?.Invoke(this, EventArgs.Empty);
+            }
+            else
+            {
+                Invalidated?.Invoke(this, EventArgs.Empty);
+            }
         }
         
         /// <summary>
@@ -99,6 +118,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             ref T newValue
         )
         {
+            int currentBufferSize = BufferSizeRequired;
+            
             if (
                 property != null &&
                 property.Equals(newValue)
@@ -108,7 +129,15 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             }
 
             property = newValue;
-            Invalidate();
+
+            // If the buffer size has changed, then this is a 'big' change and the
+            // entire list cache should invalidate
+            //
+            int newBufferSize = BufferSizeRequired;
+            
+            Invalidate(
+                currentBufferSize != newBufferSize
+            );
         }
     }
 }

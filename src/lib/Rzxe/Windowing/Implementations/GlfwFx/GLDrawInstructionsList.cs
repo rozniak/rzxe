@@ -67,8 +67,11 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                 var oldInstruction = BackingList[index];
                 var instruction    = (GLDrawInstruction) value;
                 
-                BackingList[index]          = instruction;
-                oldInstruction.Invalidated -= Instruction_Invalidated;
+                BackingList[index] = instruction;
+                oldInstruction.Invalidated    -= Instruction_Invalidated;
+                oldInstruction.InvalidatedBig -= Instruction_InvalidatedBig;
+                instruction.Invalidated       += Instruction_Invalidated;
+                instruction.InvalidatedBig    += Instruction_InvalidatedBig;
                 
                 Changed?.Invoke(
                     this,
@@ -92,7 +95,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             var instruction = (GLDrawInstruction) item;
 
             BackingList.Add(instruction);
-            instruction.Invalidated += Instruction_Invalidated;
+            instruction.Invalidated    += Instruction_Invalidated;
+            instruction.InvalidatedBig += Instruction_InvalidatedBig;
 
             Changed?.Invoke(
                 this,
@@ -103,6 +107,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             );
         }
 
+
         /// <inheritdoc />
         public void Clear()
         {
@@ -110,7 +115,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             
             foreach (GLDrawInstruction instruction in BackingList)
             {
-                instruction.Invalidated -= Instruction_Invalidated;
+                instruction.Invalidated    -= Instruction_Invalidated;
+                instruction.InvalidatedBig -= Instruction_InvalidatedBig;
             }
 
             BackingList.Clear();
@@ -174,7 +180,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             var instruction = (GLDrawInstruction) item;
 
             BackingList.Insert(index, instruction);
-            instruction.Invalidated += Instruction_Invalidated;
+            instruction.Invalidated    += Instruction_Invalidated;
+            instruction.InvalidatedBig += Instruction_InvalidatedBig;
 
             Changed?.Invoke(
                 this,
@@ -205,7 +212,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             
             if (ret)
             {
-                instruction.Invalidated -= Instruction_Invalidated;
+                instruction.Invalidated    -= Instruction_Invalidated;
+                instruction.InvalidatedBig -= Instruction_InvalidatedBig;
                 
                 Changed?.Invoke(
                     this,
@@ -229,7 +237,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             var instruction = BackingList[index];
 
             BackingList.RemoveAt(index);
-            instruction.Invalidated -= Instruction_Invalidated;
+            instruction.Invalidated    -= Instruction_Invalidated;
+            instruction.InvalidatedBig -= Instruction_InvalidatedBig;
 
             Changed?.Invoke(
                 this,
@@ -291,6 +300,23 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                 this,
                 new GLDrawInstructionsChangedEventArgs(
                     GLDrawInstructionChange.Changed,
+                    (GLDrawInstruction) sender
+                )
+            );
+        }
+        
+        /// <summary>
+        /// (Event) Handles an instruction in the list being invalidated.
+        /// </summary>
+        private void Instruction_InvalidatedBig(
+            object    sender,
+            EventArgs e
+        )
+        {
+            Changed?.Invoke(
+                this,
+                new GLDrawInstructionsChangedEventArgs(
+                    GLDrawInstructionChange.BigChange,
                     (GLDrawInstruction) sender
                 )
             );

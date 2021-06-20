@@ -17,8 +17,14 @@ namespace Oddmatics.Rzxe.Util
     public interface ICachedObject
     {
         /// <summary>
-        /// Occurs when the object has changed and any cache should be invalidated.re
+        /// Occurs when the object has changed and any cache should be invalidated.
         /// </summary>
         event EventHandler Invalidated;
+        
+        /// <summary>
+        /// Occurs when the object has changed significantly, and any cache that
+        /// includes the object at all should be invalidated.
+        /// </summary>
+        event EventHandler InvalidatedBig;
     }
 }
