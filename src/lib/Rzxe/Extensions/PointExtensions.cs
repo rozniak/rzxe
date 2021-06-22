@@ -109,7 +109,53 @@ namespace Oddmatics.Rzxe.Extensions
                 origin.Y + delta.Y
             );
         }
-
+        
+        /// <summary>
+        /// Adds the specified offset to a <see cref="Point"/>.
+        /// </summary>
+        /// <param name="origin">
+        /// The <see cref="Point"/>.
+        /// </param>
+        /// <param name="delta">
+        /// The offset to add.
+        /// </param>
+        /// <returns>
+        /// The result of the operation on the <see cref="Point"/>.
+        /// </returns>
+        public static Point Add(
+            this Point origin,
+            Size       delta
+        )
+        {
+            return new Point(
+                origin.X + delta.Width,
+                origin.Y + delta.Height
+            );
+        }
+        
+        /// <summary>
+        /// Adds the specified offset to a <see cref="PointF"/>.
+        /// </summary>
+        /// <param name="origin">
+        /// The <see cref="PointF"/>.
+        /// </param>
+        /// <param name="delta">
+        /// The offset to add.
+        /// </param>
+        /// <returns>
+        /// The result of the operation on the <see cref="PointF"/>.
+        /// </returns>
+        public static PointF Add(
+            this PointF origin,
+            SizeF       delta
+        )
+        {
+            return new PointF(
+                origin.X + delta.Width,
+                origin.Y + delta.Height
+            );
+        }
+        
         /// <summary>
         /// Computes the location of the specified point in its source region into the
         /// target region coordinate space.
@@ -450,6 +496,52 @@ namespace Oddmatics.Rzxe.Extensions
             );
         }
         
+        /// <summary>
+        /// Subtracts the specified offset from a <see cref="Point"/>.
+        /// </summary>
+        /// <param name="origin">
+        /// The <see cref="Point"/>.
+        /// </param>
+        /// <param name="delta">
+        /// The offset to subtract.
+        /// </param>
+        /// <returns>
+        /// The result of the operation on the <see cref="Point"/>.
+        /// </returns>
+        public static Point Subtract(
+            this Point origin,
+            Size       delta
+        )
+        {
+            return new Point(
+                origin.X - delta.Width,
+                origin.Y - delta.Height
+            );
+        }
+        
+        /// <summary>
+        /// Subtracts the specified offset from a <see cref="PointF"/>.
+        /// </summary>
+        /// <param name="origin">
+        /// The <see cref="PointF"/>.
+        /// </param>
+        /// <param name="delta">
+        /// The offset to subtract.
+        /// </param>
+        /// <returns>
+        /// The result of the operation on the <see cref="PointF"/>.
+        /// </returns>
+        public static PointF Subtract(
+            this PointF origin,
+            SizeF       delta
+        )
+        {
+            return new PointF(
+                origin.X - delta.Width,
+                origin.Y - delta.Height
+            );
+        }
+
         /// <summary>
         /// Converts a <see cref="PointF"/> to a <see cref="Point"/>.
         /// </summary>

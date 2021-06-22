@@ -72,12 +72,30 @@ namespace Oddmatics.Rzxe.Game.Interface
         /// <summary>
         /// Handles a mouse click on the component..
         /// </summary>
-        public virtual void OnClick() { }
+        /// <param name="mouseButton">
+        /// The mouse button that was clicked.
+        /// </param>
+        /// <param name="mouseLocation">
+        /// The location of the mouse during the click.
+        /// </param>
+        public virtual void OnClick(
+            ControlInput mouseButton,
+            Point        mouseLocation
+        ) { }
         
         /// <summary>
         /// Handles a mouse button being pressed on the component.
         /// </summary>
-        public virtual void OnMouseDown() { }
+        /// <param name="mouseButton">
+        /// The mouse button that was pressed.
+        /// </param>
+        /// <param name="mouseLocation">
+        /// The location of the mouse during the press.
+        /// </param>
+        public virtual void OnMouseDown(
+            ControlInput mouseButton,
+            Point        mouseLocation
+        ) { }
         
         /// <summary>
         /// Handles the mouse entering the bounds of the component.
@@ -90,9 +108,28 @@ namespace Oddmatics.Rzxe.Game.Interface
         public virtual void OnMouseLeave() { }
         
         /// <summary>
+        /// Handles the mouse moving within the bounds of the component.
+        /// </summary>
+        /// <param name="mouseLocation">
+        /// The location of the mouse.
+        /// </param>
+        public virtual void OnMouseMove(
+            Point mouseLocation
+        ) { }
+
+        /// <summary>
         /// Handles a mouse button being released from the component.
         /// </summary>
-        public virtual void OnMouseUp() { }
+        /// <param name="mouseButton">
+        /// The mouse button that was pressed.
+        /// </param>
+        /// <param name="mouseLocation">
+        /// The location of the mouse during the release.
+        /// </param>
+        public virtual void OnMouseUp(
+            ControlInput mouseButton,
+            Point        mouseLocation
+        ) { }
         
         
         /// <inheritdoc />

@@ -7,6 +7,7 @@
  * Author(s): Rory Fewell <roryf@oddmatics.uk>
  */
 
+using Oddmatics.Rzxe.Extensions;
 using Oddmatics.Rzxe.Input;
 using Oddmatics.Rzxe.Logic;
 using Oddmatics.Rzxe.Util.Collections;
@@ -97,6 +98,8 @@ namespace Oddmatics.Rzxe.Game.Interface
 
             if (component != null)
             {
+                bool enteredComponent = false;
+                
                 // Check - has the mouse entered a component?
                 //
                 if (HoveredComponent != component)
@@ -107,6 +110,20 @@ namespace Oddmatics.Rzxe.Game.Interface
                     }
 
                     component.OnMouseEnter();
+                    component.OnMouseMove(inputs.MousePosition.ToPoint());
+
+                    enteredComponent = true;
+                }
+
+                // Check - has mouse moved within a component?
+                //   (don't bother if we've already sent a mouse move during entry!)
+                //
+                if (
+                    !enteredComponent &&
+                    inputs.MouseMovement != PointF.Empty
+                )
+                {
+                    component.OnMouseMove(inputs.MousePosition.ToPoint());
                 }
 
                 //
@@ -122,18 +139,27 @@ namespace Oddmatics.Rzxe.Game.Interface
                     {
                         ClickStartedComponent[i] = component;
 
-                        component.OnMouseDown();
+                        component.OnMouseDown(
+                            button,
+                            inputs.MousePosition.ToPoint()
+                        );
                     }
                     else if (inputs.NewReleases.Contains(button))
                     {
-                        component.OnMouseUp();
+                        component.OnMouseUp(
+                            button,
+                            inputs.MousePosition.ToPoint()
+                        );
 
                         // If the originally clicked component is the one
                         // currently hovered, then trigger a click event
                         //
                         if (ClickStartedComponent[i] == component)
                         {
-                            component.OnClick();
+                            component.OnClick(
+                                button,
+                                inputs.MousePosition.ToPoint()
+                            );
                         }
                     }
                 }

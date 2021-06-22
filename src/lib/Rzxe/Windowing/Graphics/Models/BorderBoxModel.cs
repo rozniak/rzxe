@@ -12,7 +12,7 @@ namespace Oddmatics.Rzxe.Windowing.Graphics.Models
     /// <summary>
     /// Represents a data model for border box information.
     /// </summary>
-    public class BorderBoxModel
+    public sealed class BorderBoxModel
     {
         /// <summary>
         /// Gets or sets the name of the border box.

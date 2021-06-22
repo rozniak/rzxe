@@ -157,6 +157,18 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
 
                 foreach (char c in line)
                 {
+                    // Space characters should simply progress the caret
+                    //
+                    if (c == ' ')
+                    {
+                        xCurrent += glFont.SpaceWidth * glFont.Scale;
+                        prevChar = c;
+
+                        continue;
+                    }
+
+                    // Normal character, carry on
+                    //
                     GLSprite sprite;
                     char     thisChar = glFont.TryGetCharacterSprite(c, out sprite);
                     

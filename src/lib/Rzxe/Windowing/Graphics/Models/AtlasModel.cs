@@ -14,7 +14,7 @@ namespace Oddmatics.Rzxe.Windowing.Graphics.Models
     /// <summary>
     /// Represents a data model for sprite atlas information.
     /// </summary>
-    public class AtlasModel
+    public sealed class AtlasModel
     {
         /// <summary>
         /// Gets or sets the collection of border box definitions.

@@ -14,7 +14,7 @@ namespace Oddmatics.Rzxe.Windowing.Graphics.Models
     /// <summary>
     /// Represents a data model for sprite font information.
     /// </summary>
-    public class FontModel
+    public sealed class FontModel
     {
         /// <summary>
         /// Gets or sets the character spacing of the font.
@@ -41,6 +41,11 @@ namespace Oddmatics.Rzxe.Windowing.Graphics.Models
         public string Name { get; set; }
         
         /// <summary>
+        /// Gets or sets the width of a standard space character.
+        /// </summary>
+        public int SpaceWidth { get; set; }
+
+        /// <summary>
         /// Gets or sets the base name when searching for sprites by name to use for
         /// characters in the font.
         /// </summary>
@@ -56,6 +61,7 @@ namespace Oddmatics.Rzxe.Windowing.Graphics.Models
             Kerning          = new Dictionary<string, int[]>();
             LineSpacing      = 0;
             Name             = string.Empty;
+            SpaceWidth       = 0;
             SpriteNameBase   = string.Empty;
         }
     }

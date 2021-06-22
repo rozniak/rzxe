@@ -7,6 +7,7 @@
  * Author(s): Rory Fewell <roryf@oddmatics.uk>
  */
 
+using Oddmatics.Rzxe.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -33,11 +34,19 @@ namespace Oddmatics.Rzxe.Input
         /// Gets a value indicating whether the state is read-only.
         /// </summary>
         public bool IsReadOnly { get; private set; }
-        
+
         /// <summary>
         /// Gets the last position of the mouse.
         /// </summary>
         public PointF LastMousePosition { get; private set; }
+        
+        /// <summary>
+        /// Gets the mouse movement since the last update.
+        /// </summary>
+        public PointF MouseMovement
+        {
+            get { return MousePosition.Subtract(LastMousePosition); }
+        }
 
         /// <summary>
         /// Gets the mouse position in the state.

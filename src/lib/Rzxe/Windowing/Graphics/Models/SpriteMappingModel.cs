@@ -14,7 +14,7 @@ namespace Oddmatics.Rzxe.Windowing.Graphics.Models
     /// <summary>
     /// Represents a data model for sprite mapping information.
     /// </summary>
-    public class SpriteMappingModel
+    public sealed class SpriteMappingModel
     {
         /// <summary>
         /// Gets or sets the bounds of the sprite on the atlas.

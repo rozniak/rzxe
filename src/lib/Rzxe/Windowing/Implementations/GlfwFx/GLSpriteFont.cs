@@ -45,6 +45,11 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         public int Scale { get; private set; }
         
         /// <summary>
+        /// Gets the width of space character in the font.
+        /// </summary>
+        public int SpaceWidth { get; set; }
+        
+        /// <summary>
         /// Gets the base name when searching for sprites by name to use for
         /// characters in the font.
         /// </summary>
@@ -60,8 +65,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         /// The sprites for characters defined in the font.
         /// </summary>
         private IReadOnlyDictionary<char, GLSprite> CharacterSprites { get; set; }
-        
-        
+
+
         /// <summary>
         /// Initializes a new instance of the <see cref="GLSpriteFont"/> class.
         /// </summary>
@@ -86,6 +91,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             LineSpacing      = model.LineSpacing;
             Name             = model.Name;
             Scale            = scale;
+            SpaceWidth       = model.SpaceWidth;
             SpriteNameBase   = model.SpriteNameBase;
             
             if (scale < 1)
@@ -216,31 +222,49 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             
             foreach (char c in line)
             {
-                GLSprite sprite;
-                char     thisChar = TryGetCharacterSprite(c, out sprite);
+                int  netAdvance      = 0;
+                int  netNegYBaseline = 0;
+                int  netPosYBaseline = 0;
+                char thisChar        = c;
                 
-                // Retrieve kerning metrics (if present)
+                // We may handle certain special characters differently
                 //
-                int[]  kerning = { 0, 0 };
-                string kernStr = $"{prevChar}{thisChar}";
-                
-                if (
-                    prevChar != '\0' &&
-                    Kerning.ContainsKey(kernStr)
-                )
+                switch (c)
                 {
-                    kerning = Kerning[kernStr];
-                }
+                    case ' ':
+                        netAdvance += SpaceWidth * Scale;
+                        break;
+
+                    default:
+                        GLSprite sprite;
+                        
+                        thisChar = TryGetCharacterSprite(c, out sprite);
                 
-                // Calculate the metrics now
-                //
-                int netAdvance      = (
-                                          sprite.Size.Width +
-                                          CharacterSpacing  +
-                                          kerning[0]
-                                      ) * Scale;
-                int netNegYBaseline = kerning[1] * Scale;
-                int netPosYBaseline = (sprite.Size.Height - kerning[1]) * Scale;
+                        // Retrieve kerning metrics (if present)
+                        //
+                        int[]  kerning = { 0, 0 };
+                        string kernStr = $"{prevChar}{thisChar}";
+                        
+                        if (
+                            prevChar != '\0' &&
+                            Kerning.ContainsKey(kernStr)
+                        )
+                        {
+                            kerning = Kerning[kernStr];
+                        }
+                        
+                        // Calculate the metrics now
+                        //
+                        netAdvance      = (
+                                              sprite.Size.Width +
+                                              CharacterSpacing  +
+                                              kerning[0]
+                                          ) * Scale;
+                        netNegYBaseline = kerning[1] * Scale;
+                        netPosYBaseline = (sprite.Size.Height - kerning[1]) * Scale;
+                        
+                        break;
+                }
                 
                 if (netAdvance > 0)
                 {
@@ -260,9 +284,13 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
                 prevChar = thisChar;
             }
 
-            // The above loop will have an extra space - we subtract that now
+            // The above loop will have an extra space unless the last character was
+            // a space itself - we subtract that now
             //
-            maxWidth -= CharacterSpacing;
+            if (prevChar != ' ')
+            {
+                maxWidth -= CharacterSpacing * Scale;
+            }
             
             return new SingleLineStringMetrics(
                 new Point(0, currentYOrigin),
