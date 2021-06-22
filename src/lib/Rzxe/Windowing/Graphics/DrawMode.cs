@@ -18,12 +18,17 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
         /// The texture should be stretched to meet the target resolution if it does
         /// not match the source resolution.
         /// </summary>
-        Stretch = 0,
+        Stretch    = 0,
         
         /// <summary>
         /// The texture should be tiled to fit the target resolution if it does not
         /// match the source resolution.
         /// </summary>
-        Tiled   = 1
+        Tiled      = 1,
+        
+        /// <summary>
+        /// The polygon should be drawn using the tint color only.
+        /// </summary>
+        SolidColor = 2,
     }
 }

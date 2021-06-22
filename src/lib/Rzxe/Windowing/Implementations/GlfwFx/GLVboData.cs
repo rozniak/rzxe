@@ -7,8 +7,10 @@
  * Author(s): Rory Fewell <roryf@oddmatics.uk>
  */
 
+using Oddmatics.Rzxe.Util.Shapes;
 using Oddmatics.Rzxe.Windowing.Graphics;
 using Pencil.Gaming.MathUtils;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 
@@ -125,7 +127,42 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
 
             VertexCount = 0;
         }
+        
+        
+        /// <summary>
+        /// Expands a draw call into buffer data.
+        /// </summary>
+        /// <param name="shape">
+        /// The shape to draw.
+        /// </param>
+        /// <param name="location">
+        /// The location to draw the shape.
+        /// </param>
+        /// <param name="color">
+        /// The color to draw the shape.
+        /// </param>
+        public void Draw(
+            Shape    shape,
+            Vector2i location,
+            Color    color
+        )
+        {
+            // Handle whatever the shape is...
+            //
+            switch (shape)
+            {
+                case Polygon p:
+                    DrawPolygon(p, location, color);
+                    break;
 
+                default:
+                    throw new NotImplementedException(
+                        "Unknown shape."
+                    );
+            }
+
+            
+        }
 
         /// <summary>
         /// Expands a draw call into buffer data.
@@ -158,19 +195,19 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             _UvContentsData.AddRange(MakeVboData(sourceRect));
 
             _SourceRectsData.AddRange(
-                CloneFillVboData(sourceRect)
+                CloneFillVboData(sourceRect, 2)
             );
             _OriginsData.AddRange(
-                CloneFillVboData(destRect.Position)
+                CloneFillVboData(destRect.Position, 2)
             );
             _DrawModesData.AddRange(
-                CloneFillVboData((float) drawMode)
+                CloneFillVboData((float) drawMode, 2)
             );
             _AlphaScalesData.AddRange(
-                CloneFillVboData(alpha)
+                CloneFillVboData(alpha, 2)
             );
             _TintsData.AddRange(
-                CloneFillVboData(tint)
+                CloneFillVboData(tint, 2)
             );
 
             VertexCount += 6;
@@ -199,6 +236,98 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         
         
         /// <summary>
+        /// Expands a draw call for a basic polygon into buffer data.
+        /// </summary>
+        /// <param name="polygon">
+        /// The shape to draw.
+        /// </param>
+        /// <param name="location">
+        /// The location to draw the shape.
+        /// </param>
+        /// <param name="color">
+        /// The color to draw the shape.
+        /// </param>
+        private void DrawPolygon(
+            Polygon  polygon,
+            Vector2i location,
+            Color    color
+        )
+        {
+            //
+            // First divvy up the shape into triangles
+            //
+            var triangles = new List<Shape>();
+
+            Point lastVertex;
+            Point origin;
+
+            // Add the first triangle
+            //
+            triangles.Add(
+                new Polygon(
+                    polygon.Vertices[0],
+                    polygon.Vertices[1],
+                    polygon.Vertices[2]
+                )
+            );
+
+            origin     = polygon.Vertices[0];
+            lastVertex = polygon.Vertices[2];
+            
+            // Add remainder of traingles, stitched together in a 'fan'
+            //
+            for (int i = 3; i < polygon.Vertices.Length; i++)
+            {
+                Point nextVertex = polygon.Vertices[i];
+                
+                triangles.Add(
+                    new Polygon(
+                        origin,
+                        lastVertex,
+                        nextVertex
+                    )
+                );
+
+                lastVertex = nextVertex;
+            }
+            
+            //
+            // Now create the buffer for the triangles
+            //
+            foreach (Polygon triangle in triangles)
+            {
+                foreach (Point p in triangle.Vertices)
+                {
+                    _DrawContentsData.Add((float) p.X + location.X);
+                    _DrawContentsData.Add((float) p.Y + location.Y);
+                }
+
+                _UvContentsData.AddRange(
+                    CloneFillVboData(Vector2i.Zero, 1)
+                );
+
+                _SourceRectsData.AddRange(
+                    CloneFillVboData(new Rectanglei(), 1)
+                );
+                _OriginsData.AddRange(
+                    CloneFillVboData(Vector2i.Zero, 1)
+                );
+                _DrawModesData.AddRange(
+                    CloneFillVboData((float) DrawMode.SolidColor, 1)
+                );
+                _AlphaScalesData.AddRange(
+                    CloneFillVboData(color.A, 1)
+                );
+                _TintsData.AddRange(
+                    CloneFillVboData(color, 1)
+                );
+
+                VertexCount += 3;
+            }
+        }
+
+
+        /// <summary>
         /// Clones values for insertion into the buffer.
         /// </summary>
         /// <param name="singleValue">
@@ -208,12 +337,13 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         /// The cloned values as an array.
         /// </returns>
         public static float[] CloneFillVboData(
-            float singleValue
+            float singleValue,
+            int   numTriangles
         )
         {
             var buf = new List<float>();
             
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < numTriangles * 3; i++)
             {
                 buf.Add(singleValue);
             }
@@ -231,12 +361,13 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         /// The cloned values as an array.
         /// </returns>
         public static float[] CloneFillVboData(
-            Vector2i vec2
+            Vector2i vec2,
+            int      numTriangles
         )
         {
             var buf = new List<float>();
             
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < numTriangles * 3; i++)
             {
                 buf.Add(vec2.X);
                 buf.Add(vec2.Y);
@@ -255,12 +386,13 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         /// The cloned values as an array.
         /// </returns>
         public static float[] CloneFillVboData(
-            Color color
+            Color color,
+            int   numTriangles
         )
         {
             var buf = new List<float>();
             
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < numTriangles * 3; i++)
             {
                 buf.Add(color.R / 255f);
                 buf.Add(color.G / 255f);
@@ -281,12 +413,13 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         /// The cloned values as an array.
         /// </returns>
         public static float[] CloneFillVboData(
-            Rectanglei rect
+            Rectanglei rect,
+            int        numTriangles
         )
         {
             var buf = new List<float>();
             
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < numTriangles * 3; i++)
             {
                 buf.Add(rect.Left);
                 buf.Add(rect.Top);

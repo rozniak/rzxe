@@ -122,6 +122,11 @@
     <Compile Include="Windowing\Implementations\GlfwFx\GLDrawInstructionChange.cs" />
     <Compile Include="Windowing\Implementations\GlfwFx\GLDynamicSpriteBatch.cs" />
     <Compile Include="Windowing\Implementations\GlfwFx\GLStaticSpriteBatch.cs" />
+    <Compile Include="Game\Interface\MouseInputEvent.cs" />
+    <Compile Include="Util\Shapes\Shape.cs" />
+    <Compile Include="Util\Shapes\Polygon.cs" />
+    <Compile Include="Windowing\Graphics\IShapeDrawInstruction.cs" />
+    <Compile Include="Windowing\Implementations\GlfwFx\GLShapeDrawInstruction.cs" />
   </ItemGroup>
   <ItemGroup>
     <ContentWithTargetPath Include="Windowing\Implementations\GlfwFx\Shaders\fragment.glsl">
@@ -147,6 +152,7 @@
     <Folder Include="Extensions\" />
     <Folder Include="Game\Animation\" />
     <Folder Include="Game\Hosting\" />
+    <Folder Include="Util\Shapes\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

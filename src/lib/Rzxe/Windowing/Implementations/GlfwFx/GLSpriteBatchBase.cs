@@ -7,6 +7,7 @@
  * Author(s): Rory Fewell <roryf@oddmatics.uk>
  */
 
+using Oddmatics.Rzxe.Util.Shapes;
 using Oddmatics.Rzxe.Windowing.Graphics;
 using Pencil.Gaming.Graphics;
 using System;
@@ -195,6 +196,25 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         /// <inheritdoc />
         public abstract void Dispose();
         
+        /// <inheritdoc />
+        public virtual IShapeDrawInstruction Draw(
+            Shape shape,
+            Point location,
+            Color color
+        )
+        {
+            var instruction = new GLShapeDrawInstruction((GLSpriteAtlas) Atlas)
+                              {
+                                  Color    = color,
+                                  Location = location,
+                                  Shape    = shape
+                              };
+
+            _Instructions.Add(instruction);
+
+            return instruction;
+        }
+
         /// <inheritdoc />
         public virtual ISpriteDrawInstruction Draw(
             ISprite sprite,

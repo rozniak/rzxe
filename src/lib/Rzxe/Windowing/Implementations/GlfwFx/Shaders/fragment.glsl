@@ -57,7 +57,7 @@ vec3 tint(
 }
 
 
-void main()
+vec4 handleUVDrawModes()
 {
     // Set up UV
     //
@@ -68,7 +68,7 @@ void main()
     {
         naturalUV = fsUV;
     }
-    else if (fsDrawMode == 1)
+    else
     {
         vec2 modUV;
         
@@ -77,7 +77,7 @@ void main()
                 mod(gl_FragCoord.x - fsOrigin.x, fsSourceRect.z),
                 mod(gCanvasResolution.y - gl_FragCoord.y - fsOrigin.y, fsSourceRect.w)
             );
-                    
+        
         naturalUV = fsSourceRect.xy + modUV.xy;
     }
     
@@ -92,9 +92,29 @@ void main()
     vec4 sampled = texture(TextureSampler, scaledUV);
     vec3 tinted  = tint(sampled.rgb, fsTint);
     
-    outColor =
-        vec4(
-            tinted,
-            scaleAlpha(sampled.a, fsAlphaScale)
-        );
+    return vec4(
+        tinted,
+        scaleAlpha(sampled.a, fsAlphaScale)
+    );
+}
+
+
+void main()
+{
+    switch (int(fsDrawMode))
+    {
+        // Stretch
+        // Tiled
+        //
+        case 0:
+        case 1:
+            outColor = handleUVDrawModes();
+            break;
+        
+        // SolidColor
+        //
+        case 2:
+            outColor = vec4(fsTint.rgba);
+            break;
+    }
 }

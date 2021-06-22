@@ -7,6 +7,7 @@
  * Author(s): Rory Fewell <roryf@oddmatics.uk>
  */
 
+using Oddmatics.Rzxe.Util.Shapes;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -35,6 +36,27 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
         
         
         /// <summary>
+        /// Draws a shape at the specified location.
+        /// </summary>
+        /// <param name="shape">
+        /// The shape to draw.
+        /// </param>
+        /// <param name="location">
+        /// The location to draw the shape.
+        /// </param>
+        /// <param name="color">
+        /// The color to draw the shape.
+        /// </param>
+        /// <returns>
+        /// The drawing instruction that was generated.
+        /// </returns>
+        IShapeDrawInstruction Draw(
+            Shape shape,
+            Point location,
+            Color color
+        );
+        
+        /// <summary>
         /// Draws a sprite at the specified location.
         /// </summary>
         /// <param name="sprite">
@@ -44,7 +66,7 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
         /// The location to draw the sprite.
         /// </param>
         /// <param name="tint">
-        /// The colour to tint the sprite with, specify
+        /// The color to tint the sprite with, specify
         /// <see cref="Color.Transparent"/> for no tinting.
         /// </param>
         /// <param name="alpha">

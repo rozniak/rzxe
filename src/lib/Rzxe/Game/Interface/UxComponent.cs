@@ -7,6 +7,8 @@
  * Author(s): Rory Fewell <roryf@oddmatics.uk>
  */
 
+using Oddmatics.Rzxe.Extensions;
+using Oddmatics.Rzxe.Input;
 using Oddmatics.Rzxe.Windowing.Graphics;
 using System;
 using System.Drawing;
@@ -97,6 +99,24 @@ namespace Oddmatics.Rzxe.Game.Interface
         public abstract void Dispose();
         
         /// <summary>
+        /// Computes the location of the specified viewport point into client
+        /// coordinates.
+        /// </summary>
+        /// <param name="p">
+        /// The viewport coordinate <see cref="Point"/> to convert.
+        /// </param>
+        /// <returns>
+        /// A <see cref="Point"/> that represents the converted <see cref="Point"/>
+        /// <paramref name="p"/>, in client coordinates.
+        /// </returns>
+        public Point PointToClient(
+            Point p
+        )
+        {
+            return p.Subtract(Location);
+        }
+        
+        /// <summary>
         /// Renders the component.
         /// </summary>
         /// <param name="sb">
@@ -105,8 +125,8 @@ namespace Oddmatics.Rzxe.Game.Interface
         public virtual void Render(
             ISpriteBatch sb
         ) { }
-        
-        
+
+
         /// <summary>
         /// Asserts that the component is not disposed.
         /// </summary>
