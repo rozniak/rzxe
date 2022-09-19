@@ -28,6 +28,32 @@ namespace Oddmatics.Rzxe.Game.Animation
         
         
         /// <summary>
+        /// Occurs when the active animation has finished playback.
+        /// </summary>
+        public event EventHandler FinishedPlayback
+        {
+            add
+            {
+                if (ActiveAnimation == null)
+                {
+                    return;
+                }
+
+                ActiveAnimation.FinishedPlayback += value;
+            }
+            
+            remove
+            {
+                if (ActiveAnimation == null)
+                {
+                    return;
+                }
+
+                ActiveAnimation.FinishedPlayback -= value;
+            }
+        }
+
+        /// <summary>
         /// Occurs when a frame that emits an event has been entered in the active
         /// animation.
         /// </summary>

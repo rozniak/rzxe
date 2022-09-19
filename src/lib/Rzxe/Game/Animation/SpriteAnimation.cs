@@ -113,6 +113,7 @@ namespace Oddmatics.Rzxe.Game.Animation
                 frameset.Add(
                     new SpriteAnimationFrame(frame)
                 );
+                
                 TotalDuration =
                     TotalDuration.Add(
                         TickSize.Multiply(frame.Ticks)
@@ -168,6 +169,7 @@ namespace Oddmatics.Rzxe.Game.Animation
                     
                     if (CurrentFrameIndex >= Frameset.Count)
                     {
+                        FinishedPlayback?.Invoke(this, EventArgs.Empty);
                         CurrentFrameIndex = 0;
                     }
                     
