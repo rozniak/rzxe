@@ -10,9 +10,9 @@
 using Newtonsoft.Json;
 using Oddmatics.Rzxe.Windowing.Graphics;
 using Oddmatics.Rzxe.Windowing.Graphics.Models;
+using Oddmatics.Rzxe.Util;
 using Pencil.Gaming.Graphics;
 using Pencil.Gaming.MathUtils;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
@@ -23,7 +23,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
     /// <summary>
     /// The OpenGL implementation of the sprite atlas interface.
     /// </summary>
-    internal sealed class GLSpriteAtlas : ISpriteAtlas, IDisposable
+    internal sealed class GLSpriteAtlas : DisposableBase, ISpriteAtlas
     {
         /// <inheritdoc />
         public IReadOnlyDictionary<string, IBorderBoxResource> BorderBoxes
@@ -54,12 +54,6 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         /// <inheritdoc />
         public IReadOnlyDictionary<string, ISprite> Sprites { get; private set; }
         
-        
-        /// <summary>
-        /// The value that indicates whether the class is disposing or has been
-        /// disposed.
-        /// </summary>
-        private bool Disposing { get; set; }
         
         /// <summary>
         /// The available font models in the atlas.
@@ -140,14 +134,9 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         
         
         /// <inheritdoc />
-        public void Dispose()
+        public override void Dispose()
         {
-            if (Disposing)
-            {
-                throw new ObjectDisposedException(Name);
-            }
-
-            Disposing = true;
+            base.Dispose();
 
             GL.DeleteTexture(GlTextureId);
         }
@@ -158,6 +147,8 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             int    scale = 1
         )
         {
+            AssertNotDisposed();
+        
             if (!FontModels.ContainsKey(name))
             {
                 throw new KeyNotFoundException(

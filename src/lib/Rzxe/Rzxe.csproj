@@ -127,6 +127,7 @@
     <Compile Include="Util\Collections\ItemAddingEvent.cs" />
     <Compile Include="Util\Collections\ItemMembershipChangedEvent.cs" />
     <Compile Include="Util\Collections\ItemRemovingEvent.cs" />
+    <Compile Include="Util\DisposableBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <ContentWithTargetPath Include="Windowing\Implementations\GlfwFx\Shaders\fragment.glsl">

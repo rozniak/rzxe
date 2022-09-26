@@ -8,6 +8,7 @@
  */
 
 using Oddmatics.Rzxe.Input;
+using Oddmatics.Rzxe.Util;
 using Oddmatics.Rzxe.Windowing.Graphics;
 using System;
 
@@ -16,7 +17,7 @@ namespace Oddmatics.Rzxe.Game
     /// <summary>
     /// Represents a state for the game.
     /// </summary>
-    public abstract class GameState : IDisposable, IEquatable<GameState>
+    public abstract class GameState : DisposableBase, IEquatable<GameState>
     {
         /// <summary>
         /// Gets the focal mode for the state.
@@ -28,9 +29,6 @@ namespace Oddmatics.Rzxe.Game
         /// </summary>
         public abstract string Name { get; }
         
-        
-        /// <inheritdoc />
-        public virtual void Dispose() { }
 
         /// <inheritdoc />
         public bool Equals(

@@ -8,6 +8,7 @@
  */
 
 using Oddmatics.Rzxe.Game;
+using Oddmatics.Rzxe.Util;
 using Pencil.Gaming.Graphics;
 using System;
 using System.Collections.Generic;
@@ -19,18 +20,12 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
     /// Represents a resource cache that retrieves and stores graphics objects for the
     /// OpenGL renderer implementation.
     /// </summary>
-    internal class GLResourceCache : IDisposable
+    internal class GLResourceCache : DisposableBase
     {
         /// <summary>
         /// The collection of sprite atlases that are currently loaded.
         /// </summary>
         private Dictionary<string, GLSpriteAtlas> Atlases { get; set; }
-        
-        /// <summary>
-        /// The value that indicates whether the class is disposing or has been
-        /// disposed.
-        /// </summary>
-        private bool Disposing { get; set; }
         
         /// <summary>
         /// The game engine parameters.
@@ -60,14 +55,9 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
         
         
         /// <inheritdoc />
-        public void Dispose()
+        public override void Dispose()
         {
-            if (Disposing)
-            {
-                throw new ObjectDisposedException("GLFW Resource Cache");
-            }
-
-            Disposing = true;
+            base.Dispose();
 
             // Delete all shader programs
             //
@@ -104,10 +94,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             string atlasName
         )
         {
-            if (Disposing)
-            {
-                throw new ObjectDisposedException("GLFW Resource Cache");
-            }
+            AssertNotDisposed();
 
             string atlasNameLower = atlasName.ToLower();
 
@@ -146,10 +133,7 @@ namespace Oddmatics.Rzxe.Windowing.Implementations.GlfwFx
             string programName
         )
         {
-            if (Disposing)
-            {
-                throw new ObjectDisposedException("GLFW Resource Cache");
-            }
+            AssertNotDisposed();
 
             // If the shader program has previously been loaded, return its GL ID
             //

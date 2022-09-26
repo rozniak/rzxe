@@ -10,9 +10,9 @@
 using Oddmatics.Rzxe.Extensions;
 using Oddmatics.Rzxe.Input;
 using Oddmatics.Rzxe.Logic;
+using Oddmatics.Rzxe.Util;
 using Oddmatics.Rzxe.Util.Collections;
 using Oddmatics.Rzxe.Windowing.Graphics;
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -22,7 +22,7 @@ namespace Oddmatics.Rzxe.Game.Interface
     /// <summary>
     /// Represents an in-game user interface shell.
     /// </summary>
-    public sealed class UxShell : IDisposable
+    public sealed class UxShell : DisposableBase
     {
         /// <summary>
         /// The mouse button controls.
@@ -68,8 +68,6 @@ namespace Oddmatics.Rzxe.Game.Interface
         /// </summary>
         public UxShell()
         {
-            //Components = new SortedList2<UxComponent>(new ZIndexComparer());
-
             Components        = new ExCollection<UxComponent>();
             ComponentComparer = new ZIndexComparer();
             
@@ -83,8 +81,10 @@ namespace Oddmatics.Rzxe.Game.Interface
 
 
         /// <inheritdoc />
-        public void Dispose()
+        public override void Dispose()
         {
+            base.Dispose();
+            
             if (SpriteBatch != null)
             {
                 SpriteBatch.Dispose();

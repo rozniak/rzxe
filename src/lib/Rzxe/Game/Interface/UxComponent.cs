@@ -9,6 +9,7 @@
 
 using Oddmatics.Rzxe.Extensions;
 using Oddmatics.Rzxe.Input;
+using Oddmatics.Rzxe.Util;
 using Oddmatics.Rzxe.Windowing.Graphics;
 using System;
 using System.Drawing;
@@ -18,7 +19,7 @@ namespace Oddmatics.Rzxe.Game.Interface
     /// <summary>
     /// Represents an in-game user interface component.
     /// </summary>
-    public abstract class UxComponent : IDisposable
+    public abstract class UxComponent : DisposableBase
     {
         /// <summary>
         /// Gets the bounds of the component.
@@ -60,13 +61,6 @@ namespace Oddmatics.Rzxe.Game.Interface
         /// Gets or sets the z-index of the component.
         /// </summary>
         public int ZIndex { get; set; }
-        
-        
-        /// <summary>
-        /// The value that indicates whether the component has been disposed or is
-        /// currently being disposed.
-        /// </summary>
-        protected bool Disposing { get; set; }
 
 
         /// <summary>
@@ -131,10 +125,6 @@ namespace Oddmatics.Rzxe.Game.Interface
             Point        mouseLocation
         ) { }
         
-        
-        /// <inheritdoc />
-        public abstract void Dispose();
-        
         /// <summary>
         /// Computes the location of the specified viewport point into client
         /// coordinates.
@@ -162,17 +152,5 @@ namespace Oddmatics.Rzxe.Game.Interface
         public virtual void Render(
             ISpriteBatch sb
         ) { }
-
-
-        /// <summary>
-        /// Asserts that the component is not disposed.
-        /// </summary>
-        protected void AssertNotDisposed()
-        {
-            if (Disposing)
-            {
-                throw new ObjectDisposedException(Name);
-            }
-        }
     }
 }
