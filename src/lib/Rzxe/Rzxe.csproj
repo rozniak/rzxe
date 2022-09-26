@@ -54,7 +54,6 @@
     <Compile Include="Input\InputFocalMode.cs" />
     <Compile Include="Logic\Collision.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Util\Collections\SortedList2.cs" />
     <Compile Include="Windowing\Graphics\IGraphicsController.cs" />
     <Compile Include="Windowing\Graphics\ISpriteBatch.cs" />
     <Compile Include="Windowing\Implementations\GlfwFx\GLGraphicsController.cs" />
@@ -124,6 +123,10 @@
     <Compile Include="Util\Shapes\Polygon.cs" />
     <Compile Include="Windowing\Graphics\IShapeDrawInstruction.cs" />
     <Compile Include="Windowing\Implementations\GlfwFx\GLShapeDrawInstruction.cs" />
+    <Compile Include="Util\Collections\ExCollection.cs" />
+    <Compile Include="Util\Collections\ItemAddingEvent.cs" />
+    <Compile Include="Util\Collections\ItemMembershipChangedEvent.cs" />
+    <Compile Include="Util\Collections\ItemRemovingEvent.cs" />
   </ItemGroup>
   <ItemGroup>
     <ContentWithTargetPath Include="Windowing\Implementations\GlfwFx\Shaders\fragment.glsl">

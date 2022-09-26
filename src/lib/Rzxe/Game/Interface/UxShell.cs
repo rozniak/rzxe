@@ -38,7 +38,7 @@ namespace Oddmatics.Rzxe.Game.Interface
         /// <summary>
         /// Gets or sets the components in the shell.
         /// </summary>
-        public SortedList2<UxComponent> Components { get; set; }
+        public ExCollection<UxComponent> Components { get; set; }
         
         
         /// <summary>
@@ -47,6 +47,11 @@ namespace Oddmatics.Rzxe.Game.Interface
         /// </summary>
         private UxComponent[] ClickStartedComponent { get; set; }
         
+        /// <summary>
+        /// The comparer used to sort components within the shell.
+        /// </summary>
+        private IComparer<UxComponent> ComponentComparer { get; set; }
+
         /// <summary>
         /// The component that the mouse is currently hovering over.
         /// </summary>
@@ -63,15 +68,20 @@ namespace Oddmatics.Rzxe.Game.Interface
         /// </summary>
         public UxShell()
         {
-            Components = new SortedList2<UxComponent>(new ZIndexComparer());
+            //Components = new SortedList2<UxComponent>(new ZIndexComparer());
+
+            Components        = new ExCollection<UxComponent>();
+            ComponentComparer = new ZIndexComparer();
+            
+            Components.ItemAdding += Components_ItemAdding;
 
             // Init array for ClickStartedComponent, an index for each
             // mouse button - left, middle, right
             //
             ClickStartedComponent = new UxComponent[3];
         }
-        
-        
+
+
         /// <inheritdoc />
         public void Dispose()
         {
@@ -241,6 +251,33 @@ namespace Oddmatics.Rzxe.Game.Interface
             }
 
             return null;
+        }
+        
+        
+        /// <summary>
+        /// (Event) Handles when a component is being added to the shell.
+        /// </summary>
+        private void Components_ItemAdding(
+            object                           sender,
+            ItemAddingEventArgs<UxComponent> e
+        )
+        {
+            var components = (ExCollection<UxComponent>) sender;
+
+            // TODO: Improve this (currently O(n))
+            //
+            int total = components.Count;
+            
+            for (int i = 0; i < total; i++)
+            {
+                if (ComponentComparer.Compare(e.Item, components[i]) < 0)
+                {
+                    e.InsertAtIndex = i;
+                    return;
+                }
+            }
+
+            e.InsertAtIndex = total;
         }
     }
 }
