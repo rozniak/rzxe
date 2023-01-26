@@ -19,7 +19,7 @@ namespace Oddmatics.Rzxe.Windowing.Graphics
     public interface IDrawInstruction : ICloneable
     {
         /// <summary>
-        /// Gets or sets the atlas.
+        /// Gets the atlas used as the texture source.
         /// </summary>
         ISpriteAtlas Atlas { get; }
 

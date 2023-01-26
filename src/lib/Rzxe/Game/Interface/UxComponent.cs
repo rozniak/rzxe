@@ -11,7 +11,6 @@ using Oddmatics.Rzxe.Extensions;
 using Oddmatics.Rzxe.Input;
 using Oddmatics.Rzxe.Util;
 using Oddmatics.Rzxe.Windowing.Graphics;
-using System;
 using System.Drawing;
 
 namespace Oddmatics.Rzxe.Game.Interface
@@ -28,7 +27,7 @@ namespace Oddmatics.Rzxe.Game.Interface
         {
             get
             {
-                return new Rectangle(Location, Size);
+                return new Rectangle(ActualLocation, Size);
             }
         }
 
@@ -40,13 +39,36 @@ namespace Oddmatics.Rzxe.Game.Interface
         /// <summary>
         /// Gets or sets the location of the component.
         /// </summary>
-        public virtual Point Location { get; set; }
-        
+        public virtual Point Location
+        {
+            get { return _Location; }
+            set
+            {
+                _Location = value;
+                Invalidate();
+            }
+        }
+        protected Point _Location;
+
         /// <summary>
         /// Gets or sets the name of the component.
         /// </summary>
         public virtual string Name { get; set; }
         
+        /// <summary>
+        /// Gets or sets the owner of the component.
+        /// </summary>
+        public virtual UxContainer Owner
+        {
+            get { return _Owner; }
+            set
+            {
+                _Owner = value;
+                Invalidate();
+            }
+        }
+        protected UxContainer _Owner;
+
         /// <summary>
         /// Gets a value indicating whether the component is selectable.
         /// </summary>
@@ -55,16 +77,58 @@ namespace Oddmatics.Rzxe.Game.Interface
         /// <summary>
         /// Gets or sets the size of the component.
         /// </summary>
-        public virtual Size Size { get; set; }
-        
+        public virtual Size Size
+        {
+            get { return _Size; }
+            set
+            {
+                _Size = value;
+                Invalidate();
+            }
+        }
+        protected Size _Size;
+
         /// <summary>
         /// Gets or sets the z-index of the component.
         /// </summary>
         public int ZIndex { get; set; }
-
+        
+        
+        /// <summary>
+        /// Gets the location of the component, taking into account if the component
+        /// resides within a container.
+        /// </summary>
+        protected Point ActualLocation
+        {
+            get
+            {
+                if (Owner == null)
+                {
+                    return Location;
+                }
+                
+                return Owner.Location.Add(Location);
+            }
+        }
+        
+        /// <summary>
+        /// The value that indicates whether the state of the component is dirty and the
+        /// draw instructions must be updated on the next render call.
+        /// </summary>
+        protected bool Dirty { get; set; }
+        
+        
+        /// <summary>
+        /// Invalidates the rendered state of the control, drawing should be updated on
+        /// the next render call.
+        /// </summary>
+        public void Invalidate()
+        {
+            Dirty = true;
+        }
 
         /// <summary>
-        /// Handles a mouse click on the component..
+        /// Handles a mouse click on the component.
         /// </summary>
         /// <param name="mouseButton">
         /// The mouse button that was clicked.

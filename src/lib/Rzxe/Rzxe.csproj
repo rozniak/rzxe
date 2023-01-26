@@ -128,6 +128,8 @@
     <Compile Include="Util\Collections\ItemMembershipChangedEvent.cs" />
     <Compile Include="Util\Collections\ItemRemovingEvent.cs" />
     <Compile Include="Util\DisposableBase.cs" />
+    <Compile Include="Windowing\Graphics\SpriteBatchProxy.cs" />
+    <Compile Include="Game\Interface\UxContainer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ContentWithTargetPath Include="Windowing\Implementations\GlfwFx\Shaders\fragment.glsl">
